@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AnimKit Rig Editor</title>
+<style>
+  :root {
+    --bg:#15171c; --panel:#1d2027; --line:#2c313b; --ink:#e6e9ef;
+    --muted:#8b93a3; --accent:#ffb020; --accent2:#4aa8ff; --bone:#ff8a3d;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+         height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+  header { padding:8px 14px; background:var(--panel); border-bottom:1px solid var(--line);
+           display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  h1 { font-size:14px; margin:0 12px 0 0; letter-spacing:.5px; }
+  button, select, input[type=file]::file-selector-button {
+    background:#262b34; color:var(--ink); border:1px solid var(--line);
+    border-radius:6px; padding:5px 10px; cursor:pointer; font-size:12px; }
+  button:hover { border-color:var(--accent); }
+  button.primary { background:var(--accent); color:#1a1206; border-color:var(--accent); font-weight:600; }
+  button.on { background:var(--accent2); border-color:var(--accent2); color:#04121f; }
+  main { flex:1; display:flex; min-height:0; }
+  #stage { flex:1; position:relative; background:
+      repeating-conic-gradient(#191c22 0% 25%, #1e2229 0% 50%) 50%/28px 28px; }
+  #stage > canvas { position:absolute; inset:0; width:100%; height:100%; }
+  aside { width:300px; background:var(--panel); border-left:1px solid var(--line);
+          display:flex; flex-direction:column; overflow-y:auto; }
+  .sec { padding:10px 12px; border-bottom:1px solid var(--line); }
+  .sec h2 { font-size:11px; text-transform:uppercase; letter-spacing:.8px;
+            color:var(--muted); margin:0 0 8px; display:flex;
+            justify-content:space-between; align-items:baseline; gap:6px; }
+  .sec h2 em { font-style:normal; color:var(--accent); font-size:10px;
+               text-transform:none; letter-spacing:0; }
+  .row { display:flex; gap:6px; align-items:center; margin-bottom:6px; }
+  .row label { width:64px; color:var(--muted); font-size:11px; }
+  .row input[type=number], .row input[type=text] {
+    flex:1; background:#12151a; border:1px solid var(--line); color:var(--ink);
+    border-radius:5px; padding:4px 7px; font-size:12px; width:100%; min-width:0; }
+  #boneList, #animList { max-height:150px; overflow:auto; }
+  .item { padding:5px 8px; border-radius:5px; cursor:pointer; display:flex;
+          justify-content:space-between; align-items:center; }
+  .item:hover { background:#262b34; }
+  .item.sel { background:var(--accent2); color:#04121f; font-weight:600; }
+  .item small { opacity:.7; }
+  /* curve editor */
+  #curveWrap { position:relative; background:#12151a; border:1px solid var(--line);
+               border-radius:8px; padding:6px; }
+  #curveCv { display:block; width:100%; height:168px; touch-action:none; cursor:crosshair; }
+  .presets { display:flex; flex-wrap:wrap; gap:4px; margin-top:7px; }
+  .presets button { padding:3px 7px; font-size:11px; }
+  .readout { font:11px/1.5 ui-monospace,Menlo,monospace; color:var(--muted);
+             margin-top:6px; display:flex; justify-content:space-between; }
+  footer { height:150px; background:var(--panel); border-top:1px solid var(--line);
+           display:flex; flex-direction:column; }
+  #timelineBar { display:flex; gap:8px; align-items:center; padding:6px 12px;
+                 border-bottom:1px solid var(--line); }
+  #track { flex:1; position:relative; overflow:auto; padding:6px 12px; }
+  .laneRow { display:flex; align-items:center; height:22px; gap:8px; }
+  .laneName { width:104px; font-size:11px; color:var(--muted); flex-shrink:0;
+              white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .lane { flex:1; height:14px; background:#12151a; border-radius:7px;
+          position:relative; min-width:300px; }
+  .key { position:absolute; top:1px; width:12px; height:12px; margin-left:-6px;
+         background:var(--accent); border-radius:3px; transform:rotate(45deg);
+         cursor:pointer; }
+  .key.sel { background:#fff; }
+  .key.stepped { border-radius:0; }
+  .key.bez { background:var(--accent2); }
+  #playhead { position:absolute; top:0; bottom:0; width:2px; background:var(--accent2);
+              pointer-events:none; }
+  .hint { color:var(--muted); font-size:11px; }
+  #status { margin-left:auto; color:var(--muted); font-size:11px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>ANIMKIT RIG EDITOR</h1>
+  <button id="btnAddBone">+ Bone</button>
+  <button id="btnDelBone">Delete Bone</button>
+  <button id="modeSetup" class="on" title="Edit the rest pose">Setup</button>
+  <button id="modeAnimate" title="Edit the selected animation at the playhead">Animate</button>
+  <button id="modeIK" title="Click a bone, then its target">IK Target</button>
+  <label class="hint">Image <input type="file" id="imgFile" accept="image/*" multiple></label>
+  <button id="btnAttach">Attach Image →Bone</button>
+  <button id="btnKey" class="primary">Key Pose (K)</button>
+  <button id="btnPlay">▶ Play</button>
+  <button id="btnExport" class="primary">Export JSON</button>
+  <button id="btnImport">Import</button>
+  <input type="file" id="importFile" accept=".json" style="display:none">
+  <span id="status">ready</span>
+</header>
+
+<main>
+  <div id="stage"><canvas id="cv"></canvas></div>
+  <aside>
+    <!-- ── AI generation ───────────────────────────────────────────────
+         Rayman-style art *and* the rig that animates it, from a sentence.
+         The bridge (`python3 ai_director.py serve`) holds the API key, asks
+         for an art-spec/1 document, paints the parts with art_director.py,
+         and hands back the Spine rig plus the images — so what lands here is
+         already animatable, not a flat picture. -->
+    <div class="sec">
+      <h2>Generate <em id="bridgeState">checking bridge…</em></h2>
+      <input type="text" id="aiBrief" placeholder="a grumpy orange forest sprite"
+             style="width:100%;background:#12151a;border:1px solid var(--line);
+                    color:var(--ink);border-radius:5px;padding:5px 7px;font-size:12px">
+      <div class="row" style="margin-top:6px">
+        <button id="btnAIRig" class="primary">✦ Generate rig + art</button>
+      </div>
+      <div id="aiNote" class="hint"></div>
+    </div>
+
+    <div class="sec">
+      <h2>Bones</h2>
+      <div id="boneList"></div>
+    </div>
+    <div class="sec">
+      <h2>Selected Bone <em id="modeTag">setup</em></h2>
+      <div class="row"><label>Name</label><input type="text" id="bName"></div>
+      <div class="row"><label>X</label><input type="number" id="bX" step="1"></div>
+      <div class="row"><label>Y</label><input type="number" id="bY" step="1"></div>
+      <div class="row"><label>Rotation</label><input type="number" id="bRot" step="1"></div>
+      <div class="row"><label>Length</label><input type="number" id="bLen" step="1"></div>
+      <div class="row"><label>Spring</label><input type="number" id="bSpring" step="10" title="0 = off; secondary motion stiffness"></div>
+    </div>
+
+    <!-- ── curve editor ─────────────────────────────────────────────────
+         The runtime has always read cubic Bézier easing (Animation.swift,
+         `Curve.bezier`, solved by Newton iteration). Until now nothing could
+         author it, so every generated key was linear — which is exactly what
+         makes hand-keyed motion read as mechanical. This panel edits the curve
+         *leaving* the selected key, the same convention Spine uses. -->
+    <div class="sec">
+      <h2>Curve <em id="curveTarget">no key selected</em></h2>
+      <div id="curveWrap"><canvas id="curveCv"></canvas></div>
+      <div class="presets">
+        <button data-preset="linear">Linear</button>
+        <button data-preset="stepped">Stepped</button>
+        <button data-preset="in">Ease In</button>
+        <button data-preset="out">Ease Out</button>
+        <button data-preset="inout">In-Out</button>
+        <button data-preset="anticipate">Anticipate</button>
+        <button data-preset="overshoot">Overshoot</button>
+      </div>
+      <div class="readout">
+        <span id="curveNums">linear</span>
+        <span class="hint">drag the handles</span>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h2>Animations</h2>
+      <div class="row">
+        <input type="text" id="animName" placeholder="idle">
+        <button id="btnNewAnim">New</button>
+      </div>
+      <div class="row"><label>Duration</label><input type="number" id="animDur" step="0.1" min="0.1" value="2"></div>
+      <div id="animList"></div>
+    </div>
+  </aside>
+</main>
+
+<footer>
+  <div id="timelineBar">
+    <span class="hint">Time</span>
+    <input type="range" id="timeSlider" min="0" max="2" step="0.01" value="0" style="flex:1">
+    <span id="timeLabel" class="hint">0.00s</span>
+    <button id="btnDelKey">Delete Key</button>
+    <span class="hint">Animate mode: drag = translate · ⇧drag = rotate · K = key · Space = play</span>
+  </div>
+  <div id="track"><div id="lanes"></div><div id="playhead"></div></div>
+</footer>
+
+<script>
+// ─── model ────────────────────────────────────────────────────────────────
+// Bones: {name, parent, x, y, rotation, length, spring, attachment:{image,w,h}}
+// Animations: { name: { bones: { boneName: {
+//     rotate:[{time,value,curve?}], translate:[{time,x,y,curve?}] } } } }
+// curve: undefined = linear · 'stepped' · [cx1,cy1,cx2,cy2] cubic Bézier
+const state = {
+  bones: [{name:'root', parent:null, x:0, y:0, rotation:0, length:0, spring:0, attachment:null}],
+  animations: {},
+  ik: [],              // {name, bones:[…], target}
+  currentAnim: null,
+  sel: 0,
+  time: 0,
+  playing: false,
+  editMode: 'setup',   // setup | animate
+  ikPick: false,
+  images: {},          // name -> HTMLImageElement
+  duration: 2.0,
+  defaultCurve: null,  // curve given to newly created keys
+};
+let selectedKey = null;   // {bone, channel, time}
+
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+let view = {x:0, y:0, zoom:1};
+
+function resize() {
+  const r = cv.parentElement.getBoundingClientRect();
+  cv.width = r.width * devicePixelRatio;
+  cv.height = r.height * devicePixelRatio;
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  view.x = r.width/2; view.y = r.height*0.62;
+  draw();
+}
+window.addEventListener('resize', () => { resize(); resizeCurve(); });
+
+// ─── curves (mirrors Animation.swift `Curve.apply`) ───────────────────────
+// Newton iterations on x(s) = t, then evaluate y(s) — identical to the Swift
+// solver, so what is dialled in here is what the game plays.
+function curveEase(curve, t) {
+  if (!curve) return t;
+  if (curve === 'stepped') return 0;
+  const [cx1, cy1, cx2, cy2] = curve;
+  let s = t;
+  for (let i = 0; i < 6; i++) {
+    const mt = 1 - s;
+    const x = 3*mt*mt*s*cx1 + 3*mt*s*s*cx2 + s*s*s;
+    const dx = 3*mt*mt*cx1 + 6*mt*s*(cx2-cx1) + 3*s*s*(1-cx2);
+    if (Math.abs(dx) < 1e-4) break;
+    s -= (x - t) / dx;
+    s = Math.max(0, Math.min(1, s));
+  }
+  const mt = 1 - s;
+  return 3*mt*mt*s*cy1 + 3*mt*s*s*cy2 + s*s*s;
+}
+
+const PRESETS = {
+  linear:     null,
+  stepped:    'stepped',
+  in:         [0.42, 0.00, 1.00, 1.00],
+  out:        [0.00, 0.00, 0.58, 1.00],
+  inout:      [0.42, 0.00, 0.58, 1.00],
+  anticipate: [0.30, -0.35, 0.70, 1.00],
+  overshoot:  [0.30, 0.00, 0.60, 1.35],
+};
+
+// ─── kinematics (mirrors Skeleton.swift) ─────────────────────────────────
+function sample(keys, field, time = state.time) {
+  if (!keys || !keys.length) return 0;
+  const sorted = [...keys].sort((a,b)=>a.time-b.time);
+  if (time <= sorted[0].time) return sorted[0][field] || 0;
+  const last = sorted[sorted.length-1];
+  if (time >= last.time) return last[field] || 0;
+  let i = 0;
+  while (i < sorted.length-1 && sorted[i+1].time <= time) i++;
+  const k0 = sorted[i], k1 = sorted[i+1];
+  const f = (time - k0.time) / Math.max(k1.time - k0.time, 1e-4);
+  const e = curveEase(k0.curve, f);
+  const a = k0[field] || 0, b = k1[field] || 0;
+  return a + (b - a) * e;
+}
+
+function tracks(boneName, create = false) {
+  const anim = state.animations[state.currentAnim];
+  if (!anim) return null;
+  if (!anim.bones[boneName]) {
+    if (!create) return null;
+    anim.bones[boneName] = {rotate:[], translate:[]};
+  }
+  return anim.bones[boneName];
+}
+
+/// Animation delta on top of the setup pose, at `time`.
+function animDelta(boneName, time = state.time) {
+  const tr = tracks(boneName);
+  if (!tr) return {rot:0, x:0, y:0};
+  return {
+    rot: sample(tr.rotate, 'value', time),
+    x:   sample(tr.translate, 'x', time),
+    y:   sample(tr.translate, 'y', time),
+  };
+}
+
+function localPose(i) {
+  const b = state.bones[i];
+  const d = animDelta(b.name);
+  return {x: b.x + d.x, y: b.y + d.y, rot: b.rotation + d.rot};
+}
+
+function worldTransforms() {
+  const out = [];
+  for (let i = 0; i < state.bones.length; i++) {
+    const b = state.bones[i];
+    const p = localPose(i);
+    const pi = b.parent === null ? -1 : state.bones.findIndex(x => x.name === b.parent);
+    let wx, wy, wrot;
+    if (pi >= 0 && out[pi]) {
+      const par = out[pi];
+      const pr = par.rot * Math.PI / 180;
+      wx = par.x + p.x * Math.cos(pr) - p.y * Math.sin(pr);
+      wy = par.y + p.x * Math.sin(pr) + p.y * Math.cos(pr);
+      wrot = par.rot + p.rot;
+    } else {
+      wx = p.x; wy = p.y; wrot = p.rot;
+    }
+    out[i] = {x: wx, y: wy, rot: wrot};
+  }
+  return out;
+}
+
+// ─── drawing ─────────────────────────────────────────────────────────────
+function toScreen(p) { return {x: view.x + p.x*view.zoom, y: view.y - p.y*view.zoom}; }
+function toWorld(sx, sy) { return {x: (sx-view.x)/view.zoom, y: (view.y-sy)/view.zoom}; }
+
+function draw() {
+  const w = cv.width/devicePixelRatio, h = cv.height/devicePixelRatio;
+  ctx.clearRect(0,0,w,h);
+  ctx.strokeStyle = '#2c313b'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, view.y); ctx.lineTo(w, view.y); ctx.stroke();
+
+  const wt = worldTransforms();
+  // attachments first (art under bones)
+  state.bones.forEach((b, i) => {
+    if (!b.attachment) return;
+    const img = state.images[b.attachment.image];
+    if (!img) return;
+    const s = toScreen(wt[i]);
+    ctx.save();
+    ctx.translate(s.x, s.y);
+    ctx.rotate(-wt[i].rot * Math.PI/180);
+    const dw = b.attachment.w*view.zoom, dh = b.attachment.h*view.zoom;
+    ctx.drawImage(img, -dw/2, -dh/2, dw, dh);
+    ctx.restore();
+  });
+  // motion trail for the selected bone: the curve, made visible on the rig
+  drawTrail(wt);
+  // bones
+  state.bones.forEach((b, i) => {
+    const s = toScreen(wt[i]);
+    const len = (b.length||26) * view.zoom;
+    const rad = -wt[i].rot * Math.PI/180;
+    const tip = {x: s.x + Math.cos(rad)*len, y: s.y + Math.sin(rad)*len};
+    ctx.strokeStyle = i === state.sel ? '#4aa8ff' : '#ff8a3d';
+    ctx.lineWidth = i === state.sel ? 3.5 : 2.5;
+    ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(tip.x, tip.y); ctx.stroke();
+    ctx.fillStyle = i === state.sel ? '#4aa8ff' : '#ffb020';
+    ctx.beginPath(); ctx.arc(s.x, s.y, i === state.sel ? 6 : 4.5, 0, 7); ctx.fill();
+    ctx.fillStyle = '#8b93a3'; ctx.font = '10px sans-serif';
+    ctx.fillText(b.name, s.x + 8, s.y - 8);
+  });
+}
+
+/// Sample the selected bone's whole animation and draw where it travels — the
+/// only honest way to see what a curve did, since easing changes *spacing*, not
+/// shape. Dots bunch where the motion slows.
+function drawTrail(wt) {
+  const b = state.bones[state.sel];
+  if (!b || !state.currentAnim || !tracks(b.name)) return;
+  const keep = state.time;
+  const steps = 48;
+  const pts = [];
+  for (let i = 0; i <= steps; i++) {
+    state.time = (i / steps) * state.duration;
+    const w = worldTransforms();
+    pts.push(toScreen(w[state.sel]));
+  }
+  state.time = keep;
+  ctx.strokeStyle = 'rgba(74,168,255,0.35)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  pts.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y));
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(74,168,255,0.75)';
+  pts.forEach((p, i) => {
+    if (i % 3) return;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 1.6, 0, 7); ctx.fill();
+  });
+}
+
+// ─── canvas interaction ──────────────────────────────────────────────────
+let drag = null;
+cv.addEventListener('pointerdown', e => {
+  const r = cv.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const wt = worldTransforms();
+  let best = -1, bestD = 16;
+  state.bones.forEach((b, i) => {
+    const s = toScreen(wt[i]);
+    const d = Math.hypot(s.x-mx, s.y-my);
+    if (d < bestD) { bestD = d; best = i; }
+  });
+
+  if (state.ikPick && best >= 0 && best !== state.sel) {
+    addIK(state.sel, best);
+    return;
+  }
+  if (best >= 0) { state.sel = best; syncPanel(); }
+  const b = state.bones[state.sel];
+  drag = {mx, my, i: state.sel, start: {...b}, startDelta: animDelta(b.name)};
+  draw();
+});
+
+cv.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const r = cv.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const b = state.bones[drag.i];
+  const animating = state.editMode === 'animate' && state.currentAnim;
+
+  if (e.shiftKey) {                       // shift-drag = rotate
+    const wt = worldTransforms();
+    const s = toScreen(wt[drag.i]);
+    const ang = Math.atan2(-(my - s.y), mx - s.x) * 180/Math.PI;
+    const pi = b.parent ? state.bones.findIndex(x=>x.name===b.parent) : -1;
+    const parentRot = pi >= 0 ? wt[pi].rot : 0;
+    const wanted = Math.round(ang - parentRot);
+    if (animating) setKey(b.name, 'rotate', {value: Math.round(wanted - b.rotation)});
+    else b.rotation = wanted;
+  } else {                                // drag = translate
+    const dw = toWorld(mx, my), sw = toWorld(drag.mx, drag.my);
+    const dx = dw.x - sw.x, dy = dw.y - sw.y;
+    if (animating) {
+      setKey(b.name, 'translate', {x: Math.round(drag.startDelta.x + dx),
+                                   y: Math.round(drag.startDelta.y + dy)});
+    } else {
+      b.x = Math.round(drag.start.x + dx);
+      b.y = Math.round(drag.start.y + dy);
+    }
+  }
+  syncPanel(); draw();
+});
+window.addEventListener('pointerup', () => drag = null);
+cv.addEventListener('wheel', e => {
+  e.preventDefault();
+  view.zoom = Math.max(0.2, Math.min(4, view.zoom * (e.deltaY < 0 ? 1.1 : 0.9)));
+  draw();
+}, {passive:false});
+
+// ─── keys ────────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const roundT = t => Math.round(t * 100) / 100;
+
+/// Write (or update) a key on one channel at the playhead. New keys inherit the
+/// curve last used, so a whole animation can be dialled in once and then keyed.
+function setKey(boneName, channel, values) {
+  const tr = tracks(boneName, true);
+  if (!tr) return null;
+  const t = roundT(state.time);
+  const arr = tr[channel] = tr[channel] || [];
+  const i = arr.findIndex(k => Math.abs(k.time - t) < 0.001);
+  if (i >= 0) {
+    Object.assign(arr[i], values);
+  } else {
+    const key = {time: t, ...values};
+    if (state.defaultCurve) key.curve = state.defaultCurve;
+    arr.push(key);
+    arr.sort((a,b) => a.time - b.time);
+  }
+  selectedKey = {bone: boneName, channel, time: t};
+  renderAnimList(); renderLanes(); syncCurvePanel();
+  return arr.find(k => Math.abs(k.time - t) < 0.001);
+}
+
+function keyPose() {
+  if (!state.currentAnim) return alert('create an animation first');
+  if (state.editMode !== 'animate') {
+    setMode('animate');
+    $('status').textContent = 'switched to Animate — keys record deltas from setup';
+  }
+  const b = state.bones[state.sel];
+  const d = animDelta(b.name);
+  setKey(b.name, 'rotate', {value: Math.round(d.rot)});
+  setKey(b.name, 'translate', {x: Math.round(d.x), y: Math.round(d.y)});
+  $('status').textContent = `keyed ${b.name} @ ${roundT(state.time)}s`;
+}
+
+function selectedKeyObject() {
+  if (!selectedKey) return null;
+  const tr = tracks(selectedKey.bone);
+  if (!tr || !tr[selectedKey.channel]) return null;
+  return tr[selectedKey.channel].find(k => Math.abs(k.time - selectedKey.time) < 0.001) || null;
+}
+
+// ─── curve panel ─────────────────────────────────────────────────────────
+const curveCv = $('curveCv');
+const cctx = curveCv.getContext('2d');
+const CURVE_PAD = 22;
+
+function resizeCurve() {
+  const r = curveCv.getBoundingClientRect();
+  curveCv.width = r.width * devicePixelRatio;
+  curveCv.height = r.height * devicePixelRatio;
+  cctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  drawCurve();
+}
+
+/// Curve space: x = normalized time 0…1, y = normalized value. y is allowed
+/// outside 0…1 so anticipation and overshoot can be authored — the runtime's
+/// Newton solve only ever inverts x, so that is safe.
+const Y_LO = -0.6, Y_HI = 1.6;
+function curveToScreen(x, y) {
+  const w = curveCv.width/devicePixelRatio, h = curveCv.height/devicePixelRatio;
+  return {
+    x: CURVE_PAD + x * (w - CURVE_PAD*2),
+    y: h - CURVE_PAD - ((y - Y_LO) / (Y_HI - Y_LO)) * (h - CURVE_PAD*2),
+  };
+}
+function screenToCurve(sx, sy) {
+  const w = curveCv.width/devicePixelRatio, h = curveCv.height/devicePixelRatio;
+  return {
+    x: Math.max(0, Math.min(1, (sx - CURVE_PAD) / (w - CURVE_PAD*2))),
+    y: Y_LO + ((h - CURVE_PAD - sy) / (h - CURVE_PAD*2)) * (Y_HI - Y_LO),
+  };
+}
+
+function currentCurve() {
+  const key = selectedKeyObject();
+  return key ? (key.curve ?? null) : state.defaultCurve;
+}
+function writeCurve(curve) {
+  const key = selectedKeyObject();
+  if (key) {
+    if (curve) key.curve = curve; else delete key.curve;
+  }
+  state.defaultCurve = curve;
+  renderLanes(); syncCurvePanel(); draw();
+}
+
+function drawCurve() {
+  const w = curveCv.width/devicePixelRatio, h = curveCv.height/devicePixelRatio;
+  cctx.clearRect(0,0,w,h);
+  const curve = currentCurve();
+
+  // unit box + the y=0 / y=1 guides
+  const p00 = curveToScreen(0,0), p11 = curveToScreen(1,1);
+  cctx.strokeStyle = 'rgba(255,255,255,0.10)';
+  cctx.lineWidth = 1;
+  cctx.strokeRect(p00.x, p11.y, p11.x - p00.x, p00.y - p11.y);
+  cctx.setLineDash([3,3]);
+  cctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  [0.25, 0.5, 0.75].forEach(f => {
+    const a = curveToScreen(0, f), b = curveToScreen(1, f);
+    cctx.beginPath(); cctx.moveTo(a.x, a.y); cctx.lineTo(b.x, b.y); cctx.stroke();
+  });
+  cctx.setLineDash([]);
+
+  // the curve itself, sampled through the same solver the runtime uses
+  cctx.strokeStyle = curve === 'stepped' ? '#ff8a3d' : '#ffb020';
+  cctx.lineWidth = 2;
+  cctx.beginPath();
+  if (curve === 'stepped') {
+    const a = curveToScreen(0,0), b = curveToScreen(1,0), c = curveToScreen(1,1);
+    cctx.moveTo(a.x, a.y); cctx.lineTo(b.x, b.y); cctx.lineTo(c.x, c.y);
+  } else {
+    for (let i = 0; i <= 64; i++) {
+      const t = i / 64;
+      const p = curveToScreen(t, curveEase(curve, t));
+      i ? cctx.lineTo(p.x, p.y) : cctx.moveTo(p.x, p.y);
+    }
+  }
+  cctx.stroke();
+
+  // handles
+  if (Array.isArray(curve)) {
+    const [cx1, cy1, cx2, cy2] = curve;
+    const ends = [curveToScreen(0,0), curveToScreen(1,1)];
+    const h1 = curveToScreen(cx1, cy1), h2 = curveToScreen(cx2, cy2);
+    cctx.strokeStyle = 'rgba(74,168,255,0.6)';
+    cctx.lineWidth = 1.5;
+    cctx.beginPath(); cctx.moveTo(ends[0].x, ends[0].y); cctx.lineTo(h1.x, h1.y); cctx.stroke();
+    cctx.beginPath(); cctx.moveTo(ends[1].x, ends[1].y); cctx.lineTo(h2.x, h2.y); cctx.stroke();
+    [h1, h2].forEach(p => {
+      cctx.fillStyle = '#4aa8ff';
+      cctx.beginPath(); cctx.arc(p.x, p.y, 5, 0, 7); cctx.fill();
+    });
+  }
+
+  // playhead position inside this key's span, so the dot tracks playback
+  const key = selectedKeyObject();
+  if (key) {
+    const arr = tracks(selectedKey.bone)?.[selectedKey.channel] || [];
+    const next = arr.find(k => k.time > key.time);
+    if (next) {
+      const f = (state.time - key.time) / Math.max(next.time - key.time, 1e-4);
+      if (f >= 0 && f <= 1) {
+        const p = curveToScreen(f, curveEase(key.curve ?? null, f));
+        cctx.fillStyle = '#fff';
+        cctx.beginPath(); cctx.arc(p.x, p.y, 3.2, 0, 7); cctx.fill();
+      }
+    }
+  }
+}
+
+let curveDrag = null;
+curveCv.addEventListener('pointerdown', e => {
+  const curve = currentCurve();
+  if (!Array.isArray(curve)) {
+    // Dragging on a linear/stepped key promotes it to a Bézier — the fastest
+    // path from "this is too mechanical" to a fixed curve.
+    writeCurve([...PRESETS.inout]);
+  }
+  const r = curveCv.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const c = currentCurve();
+  const h1 = curveToScreen(c[0], c[1]), h2 = curveToScreen(c[2], c[3]);
+  curveDrag = Math.hypot(mx-h1.x, my-h1.y) <= Math.hypot(mx-h2.x, my-h2.y) ? 0 : 1;
+  curveCv.setPointerCapture(e.pointerId);
+});
+curveCv.addEventListener('pointermove', e => {
+  if (curveDrag === null) return;
+  const r = curveCv.getBoundingClientRect();
+  const p = screenToCurve(e.clientX - r.left, e.clientY - r.top);
+  const c = [...currentCurve()];
+  const snap = v => Math.round(v * 100) / 100;
+  c[curveDrag*2] = snap(p.x);
+  c[curveDrag*2+1] = snap(Math.max(Y_LO, Math.min(Y_HI, p.y)));
+  writeCurve(c);
+});
+window.addEventListener('pointerup', () => curveDrag = null);
+
+[...document.querySelectorAll('.presets button')].forEach(b => {
+  b.onclick = () => {
+    const p = PRESETS[b.dataset.preset];
+    writeCurve(Array.isArray(p) ? [...p] : p);
+    $('status').textContent = `curve: ${b.dataset.preset}`;
+  };
+});
+
+function syncCurvePanel() {
+  const key = selectedKeyObject();
+  $('curveTarget').textContent = key
+    ? `${selectedKey.bone} · ${selectedKey.channel} @ ${selectedKey.time.toFixed(2)}s`
+    : 'default for new keys';
+  const c = currentCurve();
+  $('curveNums').textContent = Array.isArray(c)
+    ? c.map(v => v.toFixed(2)).join(', ')
+    : (c || 'linear');
+  drawCurve();
+}
+
+// ─── UI wiring ───────────────────────────────────────────────────────────
+function syncPanel() {
+  const b = state.bones[state.sel];
+  if (!b) return;
+  $('bName').value = b.name; $('bX').value = b.x; $('bY').value = b.y;
+  $('bRot').value = b.rotation; $('bLen').value = b.length; $('bSpring').value = b.spring||0;
+  renderBoneList(); renderLanes();
+}
+
+function renderBoneList() {
+  $('boneList').innerHTML = state.bones.map((b,i) =>
+    `<div class="item ${i===state.sel?'sel':''}" data-i="${i}">
+       <span>${b.name}</span><small>${b.parent||'—'}</small></div>`).join('');
+  [...$('boneList').children].forEach(el =>
+    el.onclick = () => { state.sel = +el.dataset.i; syncPanel(); draw(); });
+}
+
+function renderAnimList() {
+  const names = Object.keys(state.animations);
+  $('animList').innerHTML = names.map(n =>
+    `<div class="item ${n===state.currentAnim?'sel':''}" data-n="${n}">
+       <span>${n}</span><small>${countKeys(n)} keys</small></div>`).join('')
+    || '<div class="hint">no animations yet</div>';
+  [...$('animList').children].forEach(el => {
+    if (!el.dataset.n) return;
+    el.onclick = () => {
+      state.currentAnim = el.dataset.n;
+      selectedKey = null;
+      renderAnimList(); renderLanes(); syncCurvePanel(); draw();
+    };
+  });
+}
+
+function countKeys(n) {
+  const a = state.animations[n]; if (!a) return 0;
+  return Object.values(a.bones).reduce((s,tr) =>
+    s + (tr.rotate?.length||0) + (tr.translate?.length||0), 0);
+}
+
+/// One lane per bone *per channel*: a curve belongs to a key on a channel, so
+/// merged lanes would give no way to say which key you meant.
+function renderLanes() {
+  const anim = state.animations[state.currentAnim];
+  if (!anim) {
+    $('lanes').innerHTML = '<div class="hint">create an animation to add keys</div>';
+    positionPlayhead();
+    return;
+  }
+  const rows = [];
+  for (const bn of Object.keys(anim.bones)) {
+    for (const ch of ['rotate','translate']) {
+      const keys = anim.bones[bn][ch] || [];
+      if (!keys.length) continue;
+      const marks = keys.map(k => {
+        const kind = k.curve === 'stepped' ? 'stepped' : (Array.isArray(k.curve) ? 'bez' : '');
+        const sel = selectedKey && selectedKey.bone === bn && selectedKey.channel === ch
+                    && Math.abs(selectedKey.time - k.time) < 0.001 ? 'sel' : '';
+        return `<div class="key ${kind} ${sel}" style="left:${(k.time/state.duration)*100}%"
+                     data-b="${bn}" data-ch="${ch}" data-t="${k.time}"></div>`;
+      }).join('');
+      rows.push(`<div class="laneRow"><div class="laneName">${bn} · ${ch === 'rotate' ? 'rot' : 'pos'}</div>
+                   <div class="lane">${marks}</div></div>`);
+    }
+  }
+  $('lanes').innerHTML = rows.join('') || '<div class="hint">no keys yet — press K</div>';
+  [...document.querySelectorAll('.key')].forEach(k => k.onclick = () => {
+    state.time = +k.dataset.t;
+    $('timeSlider').value = state.time;
+    $('timeLabel').textContent = state.time.toFixed(2)+'s';
+    selectedKey = {bone: k.dataset.b, channel: k.dataset.ch, time: +k.dataset.t};
+    renderLanes(); syncCurvePanel(); draw();
+  });
+  positionPlayhead();
+}
+
+/// Measured from a real lane rather than guessed with a magic offset, so the
+/// playhead lines up with the keys at any panel width.
+function positionPlayhead() {
+  const lane = document.querySelector('.lane');
+  const ph = $('playhead');
+  if (!lane) { ph.style.display = 'none'; return; }
+  ph.style.display = 'block';
+  const trackRect = $('track').getBoundingClientRect();
+  const laneRect = lane.getBoundingClientRect();
+  const x = laneRect.left - trackRect.left + $('track').scrollLeft
+          + (state.time / state.duration) * laneRect.width;
+  ph.style.left = x + 'px';
+}
+
+$('btnAddBone').onclick = () => {
+  const parent = state.bones[state.sel]?.name || null;
+  const name = prompt('Bone name', 'bone' + state.bones.length);
+  if (!name) return;
+  state.bones.push({name, parent, x:0, y:30, rotation:0, length:26, spring:0, attachment:null});
+  state.sel = state.bones.length-1; syncPanel(); draw();
+};
+$('btnDelBone').onclick = () => {
+  if (state.sel === 0) return alert('cannot delete root');
+  const gone = state.bones[state.sel].name;
+  state.bones = state.bones.filter((b,i) => i !== state.sel && b.parent !== gone);
+  state.ik = state.ik.filter(c => !c.bones.includes(gone) && c.target !== gone);
+  state.sel = 0; syncPanel(); draw();
+};
+['bName','bX','bY','bRot','bLen','bSpring'].forEach(id => {
+  $(id).oninput = () => {
+    const b = state.bones[state.sel]; if (!b) return;
+    if (id==='bName') { const old=b.name; b.name=$(id).value;
+      state.bones.forEach(c => { if (c.parent===old) c.parent=b.name; });
+      if (state.animations) Object.values(state.animations).forEach(a => {
+        if (a.bones[old]) { a.bones[b.name] = a.bones[old]; delete a.bones[old]; }
+      });
+    }
+    if (id==='bX') b.x = +$(id).value;
+    if (id==='bY') b.y = +$(id).value;
+    if (id==='bRot') b.rotation = +$(id).value;
+    if (id==='bLen') b.length = +$(id).value;
+    if (id==='bSpring') b.spring = +$(id).value;
+    renderBoneList(); draw();
+  };
+});
+
+function setMode(mode) {
+  state.editMode = mode;
+  state.ikPick = mode === 'ik';
+  $('modeSetup').classList.toggle('on', mode === 'setup');
+  $('modeAnimate').classList.toggle('on', mode === 'animate');
+  $('modeIK').classList.toggle('on', mode === 'ik');
+  $('modeTag').textContent = mode === 'animate'
+    ? (state.currentAnim ? 'animating ' + state.currentAnim : 'animate (pick an animation)')
+    : mode;
+}
+$('modeSetup').onclick = () => setMode('setup');
+$('modeAnimate').onclick = () => setMode('animate');
+$('modeIK').onclick = () => setMode('ik');
+
+/// Two-bone chain + target, exactly the shape RigLoader.parseIK expects.
+function addIK(boneIndex, targetIndex) {
+  const bone = state.bones[boneIndex], target = state.bones[targetIndex];
+  const parent = state.bones.find(b => b.name === bone.parent);
+  const chain = parent ? [parent.name, bone.name] : [bone.name];
+  const name = `ik_${bone.name}`;
+  state.ik = state.ik.filter(c => c.name !== name);
+  state.ik.push({name, bones: chain, target: target.name, mix: 1, bendPositive: true});
+  setMode('setup');
+  $('status').textContent = `IK ${chain.join('→')} aims at ${target.name}`;
+  draw();
+};
+
+$('imgFile').onchange = e => {
+  [...e.target.files].forEach(file => {
+    const img = new Image();
+    img.onload = () => { state.images[file.name] = img; $('status').textContent =
+      `loaded ${Object.keys(state.images).length} image(s)`; draw(); };
+    img.src = URL.createObjectURL(file);
+  });
+};
+$('btnAttach').onclick = () => {
+  const names = Object.keys(state.images);
+  if (!names.length) return alert('load an image first');
+  const pick = prompt('Image name:\n' + names.join('\n'), names[0]);
+  if (!pick || !state.images[pick]) return;
+  const img = state.images[pick];
+  state.bones[state.sel].attachment = {image: pick, w: img.width, h: img.height};
+  draw();
+};
+
+$('btnNewAnim').onclick = () => {
+  const n = $('animName').value.trim(); if (!n) return;
+  state.animations[n] = {bones:{}};
+  state.currentAnim = n;
+  selectedKey = null;
+  setMode('animate');
+  renderAnimList(); renderLanes(); syncCurvePanel();
+};
+$('animDur').onchange = () => {
+  state.duration = Math.max(0.1, +$('animDur').value || 2);
+  $('timeSlider').max = state.duration;
+  renderLanes();
+};
+
+$('btnKey').onclick = keyPose;
+
+$('btnDelKey').onclick = () => {
+  if (!selectedKey || !state.currentAnim) return;
+  const tr = tracks(selectedKey.bone);
+  if (!tr || !tr[selectedKey.channel]) return;
+  tr[selectedKey.channel] = tr[selectedKey.channel]
+    .filter(k => Math.abs(k.time - selectedKey.time) > 0.001);
+  selectedKey = null;
+  renderAnimList(); renderLanes(); syncCurvePanel(); draw();
+};
+
+$('timeSlider').oninput = e => {
+  state.time = +e.target.value;
+  $('timeLabel').textContent = state.time.toFixed(2)+'s';
+  renderLanes(); drawCurve(); draw();
+};
+
+let raf = null, lastT = 0;
+function tick(ts) {
+  if (!state.playing) return;
+  const dt = (ts - lastT)/1000; lastT = ts;
+  state.time = (state.time + dt) % state.duration;
+  $('timeSlider').value = state.time;
+  $('timeLabel').textContent = state.time.toFixed(2)+'s';
+  positionPlayhead(); drawCurve(); draw();
+  raf = requestAnimationFrame(tick);
+}
+$('btnPlay').onclick = () => {
+  state.playing = !state.playing;
+  $('btnPlay').textContent = state.playing ? '❚❚ Pause' : '▶ Play';
+  $('btnPlay').classList.toggle('on', state.playing);
+  if (state.playing) { lastT = performance.now(); raf = requestAnimationFrame(tick); }
+  else cancelAnimationFrame(raf);
+};
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === 'k' || e.key === 'K') keyPose();
+  if (e.code === 'Space') { e.preventDefault(); $('btnPlay').click(); }
+});
+
+// ─── export / import (AnimKit rig = Spine-compatible subset) ─────────────
+function exportKeys(keys, fields) {
+  return (keys||[]).map(k => {
+    const out = {time: k.time};
+    fields.forEach(f => out[f] = k[f] || 0);
+    // Linear is the absence of a curve, matching Spine and RigLoader.curve().
+    if (k.curve) out.curve = k.curve;
+    return out;
+  });
+}
+
+function buildExport() {
+  const out = {
+    format: 'animkit-rig/1',
+    bones: state.bones.map(b => ({
+      name: b.name, parent: b.parent || undefined,
+      x: b.x, y: b.y, rotation: b.rotation, length: b.length,
+      spring: b.spring || undefined
+    })),
+    slots: state.bones.filter(b => b.attachment).map(b => ({
+      name: 'slot_' + b.name, bone: b.name, attachment: b.attachment.image
+    })),
+    skins: [{
+      name: 'default',
+      attachments: Object.fromEntries(state.bones.filter(b => b.attachment).map(b =>
+        ['slot_' + b.name, {[b.attachment.image]: {
+          type:'region', path: b.attachment.image.replace(/\.[^.]+$/,''),
+          x:0, y:0, rotation:0, width:b.attachment.w, height:b.attachment.h
+        }}]))
+    }],
+    animations: Object.fromEntries(Object.entries(state.animations).map(([n,a]) =>
+      [n, {bones: Object.fromEntries(Object.entries(a.bones).map(([bn,tr]) => [bn, {
+        rotate: exportKeys(tr.rotate, ['value']),
+        translate: exportKeys(tr.translate, ['x','y'])
+      }]))}]))
+  };
+  if (state.ik.length) out.ik = state.ik;
+  return out;
+}
+
+$('btnExport').onclick = () => {
+  const json = JSON.stringify(buildExport(), null, 1);
+  const blob = new Blob([json], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (prompt('File name', 'hero_rig') || 'rig') + '.json';
+  a.click();
+  $('status').textContent = 'exported';
+};
+
+$('btnImport').onclick = () => $('importFile').click();
+$('importFile').onchange = e => {
+  const file = e.target.files[0]; if (!file) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try {
+      loadRig(JSON.parse(rd.result));
+      $('status').textContent = 'imported ' + file.name;
+    } catch (err) { alert('bad rig JSON: ' + err.message); }
+  };
+  rd.readAsText(file);
+};
+
+/// Load a rig object into the editor. Shared by Import and AI generation, so
+/// both paths land in exactly the same state — including curves, which is the
+/// whole point of reading them back.
+function loadRig(j) {
+  state.bones = (j.bones || []).map(b => ({
+    name: b.name, parent: b.parent || null, x: b.x || 0, y: b.y || 0,
+    rotation: b.rotation || 0, length: b.length || 26, spring: b.spring || 0,
+    attachment: null
+  }));
+  // re-link attachments from skins
+  const skin = (j.skins || [])[0];
+  if (skin) for (const [slotName, atts] of Object.entries(skin.attachments || {})) {
+    const boneName = (j.slots || []).find(s => s.name === slotName)?.bone;
+    const bi = state.bones.findIndex(b => b.name === boneName);
+    const attName = Object.keys(atts)[0];
+    if (bi >= 0 && attName) state.bones[bi].attachment =
+      {image: attName, w: atts[attName].width || 64, h: atts[attName].height || 64};
+  }
+  state.ik = Array.isArray(j.ik) ? j.ik : [];
+  state.animations = {};
+  let longest = 0;
+  for (const [n, a] of Object.entries(j.animations || {})) {
+    const bones = {};
+    for (const [bn, tr] of Object.entries(a.bones || {})) {
+      const read = (keys, fields) => (keys || []).map(k => {
+        const out = {time: k.time || 0};
+        fields.forEach(f => out[f] = k[f] || 0);
+        if (k.curve) out.curve = k.curve;   // 'stepped' or [4 numbers]
+        longest = Math.max(longest, out.time);
+        return out;
+      });
+      bones[bn] = {
+        rotate: read(tr.rotate, ['value']),
+        translate: read(tr.translate, ['x', 'y']),
+      };
+    }
+    state.animations[n] = {bones};
+  }
+  state.currentAnim = Object.keys(state.animations)[0] || null;
+  state.duration = Math.max(0.5, Math.ceil(longest * 10) / 10);
+  $('animDur').value = state.duration;
+  $('timeSlider').max = state.duration;
+  state.sel = 0; selectedKey = null;
+  syncPanel(); renderAnimList(); renderLanes(); syncCurvePanel(); draw();
+}
+
+// ─── AI bridge ───────────────────────────────────────────────────────────
+// The editor is a static file and never holds a key; `ai_director.py serve`
+// owns it. Generation returns an art-spec, the painted parts, and the Spine
+// rig — all three land here so the result is immediately editable.
+const BRIDGE = 'http://127.0.0.1:8787';
+
+async function bridge(path, body) {
+  const res = await fetch(BRIDGE + path, {
+    method: body ? 'POST' : 'GET',
+    headers: body ? {'Content-Type': 'application/json'} : undefined,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) throw new Error(`bridge ${res.status}`);
+  return res.json();
+}
+
+async function checkBridge() {
+  try {
+    const health = await bridge('/health');
+    $('bridgeState').textContent = health.hasKey
+      ? `${health.model} ready` : 'offline composer (no API key)';
+    $('bridgeState').style.color = health.hasKey ? '#3ddc97' : 'var(--accent)';
+  } catch {
+    $('bridgeState').textContent = 'bridge not running';
+    $('bridgeState').style.color = 'var(--muted)';
+    $('aiNote').textContent = 'start it with:  python3 ai_director.py serve';
+  }
+}
+
+$('btnAIRig').onclick = async () => {
+  const brief = $('aiBrief').value.trim();
+  if (!brief) { $('aiNote').textContent = 'describe the character first'; return; }
+  $('btnAIRig').disabled = true;
+  $('aiNote').textContent = 'painting parts and building the rig…';
+  try {
+    const result = await bridge('/art', {brief, build: true});
+    if (result.errors?.length) {
+      $('aiNote').textContent = 'rejected: ' + result.errors[0];
+    } else if (result.rig) {
+      loadRig(result.rig);
+      // The bridge sends the painted parts back as data URLs keyed by
+      // attachment name, so the canvas shows the real art at once.
+      const pending = Object.entries(result.images || {});
+      let loaded = 0;
+      if (!pending.length) draw();
+      pending.forEach(([name, url]) => {
+        const img = new Image();
+        img.onload = () => {
+          state.images[name] = img;
+          if (++loaded === pending.length) { draw(); }
+        };
+        img.src = url;
+      });
+      const files = (result.written || []).length;
+      $('aiNote').textContent = `${result.spec?.name || 'rig'} · ${result.note} · `
+        + `${files} file(s) written to Assets/Rigs`;
+      $('status').textContent = 'generated';
+      setMode('animate');
+    } else {
+      $('aiNote').textContent = 'the model returned a spec but the build produced no rig';
+    }
+  } catch (err) {
+    $('aiNote').textContent = 'bridge not running — python3 ai_director.py serve';
+  } finally {
+    $('btnAIRig').disabled = false;
+  }
+};
+
+// boot
+resize(); resizeCurve(); setMode('setup');
+syncPanel(); renderAnimList(); renderLanes(); syncCurvePanel(); checkBridge();
+</script>
+</body>
+</html>

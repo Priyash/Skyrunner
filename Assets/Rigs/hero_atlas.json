@@ -1,0 +1,87 @@
+{
+ "format": "atlas/1",
+ "scale": 3,
+ "trimmed": false,
+ "pages": [
+  "hero_atlas.png"
+ ],
+ "frames": {
+  "hero_body": {
+   "page": "/Users/priyash/Documents/Apple_Documents/SkyRunner/SkyRunner/Assets/Rigs/hero_atlas.png",
+   "x": 2,
+   "y": 2,
+   "w": 156,
+   "h": 180,
+   "origW": 156,
+   "origH": 180,
+   "offsetX": 0,
+   "offsetY": 0
+  },
+  "hero_head": {
+   "page": "/Users/priyash/Documents/Apple_Documents/SkyRunner/SkyRunner/Assets/Rigs/hero_atlas.png",
+   "x": 2,
+   "y": 186,
+   "w": 144,
+   "h": 144,
+   "origW": 144,
+   "origH": 144,
+   "offsetX": 0,
+   "offsetY": 0
+  },
+  "hero_tuft": {
+   "page": "/Users/priyash/Documents/Apple_Documents/SkyRunner/SkyRunner/Assets/Rigs/hero_atlas.png",
+   "x": 2,
+   "y": 334,
+   "w": 84,
+   "h": 108,
+   "origW": 84,
+   "origH": 108,
+   "offsetX": 0,
+   "offsetY": 0
+  },
+  "hero_hand_l": {
+   "page": "/Users/priyash/Documents/Apple_Documents/SkyRunner/SkyRunner/Assets/Rigs/hero_atlas.png",
+   "x": 2,
+   "y": 446,
+   "w": 66,
+   "h": 66,
+   "origW": 66,
+   "origH": 66,
+   "offsetX": 0,
+   "offsetY": 0
+  },
+  "hero_hand_r": {
+   "page": "/Users/priyash/Documents/Apple_Documents/SkyRunner/SkyRunner/Assets/Rigs/hero_atlas.png",
+   "x": 2,
+   "y": 516,
+   "w": 66,
+   "h": 66,
+   "origW": 66,
+   "origH": 66,
+   "offsetX": 0,
+   "offsetY": 0
+  },
+  "hero_foot_l": {
+   "page": "/Users/priyash/Documents/Apple_Documents/SkyRunner/SkyRunner/Assets/Rigs/hero_atlas.png",
+   "x": 2,
+   "y": 586,
+   "w": 90,
+   "h": 54,
+   "origW": 90,
+   "origH": 54,
+   "offsetX": 0,
+   "offsetY": 0
+  },
+  "hero_foot_r": {
+   "page": "/Users/priyash/Documents/Apple_Documents/SkyRunner/SkyRunner/Assets/Rigs/hero_atlas.png",
+   "x": 72,
+   "y": 446,
+   "w": 90,
+   "h": 54,
+   "origW": 90,
+   "origH": 54,
+   "offsetX": 0,
+   "offsetY": 0
+  }
+ }
+}

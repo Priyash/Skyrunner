@@ -1,0 +1,141 @@
+# SkyRunner — project definition.
+#
+# The repository deliberately has no checked-in `.xcodeproj`: a pbxproj is a
+# 2000-line machine file that conflicts on every branch and tells you nothing in
+# review. This file is the source of truth instead, and the project is generated
+# from it:
+#
+#     make project      # → SkyRunner.xcodeproj
+#
+# `make project` uses XcodeGen when it is installed and falls back to the
+# bundled `Tools/genproject.py`, which reads *this same file*. So a new engineer
+# needs nothing but Xcode.
+#
+# Adding a source file needs no edit here — directories are globbed.
+name: SkyRunner
+options:
+  bundleIdPrefix: com.skyrunner
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+  generateEmptyDirectories: false
+
+configs:
+  Debug: debug
+  Release: release
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+    SWIFT_STRICT_CONCURRENCY: minimal
+    # A game is judged on frame time, and SpriteKit puts the whole simulation in
+    # Swift. `-Onone` in Debug is the difference between 60fps and a slideshow
+    # while you are actually working on the game, so Debug builds the engine
+    # optimised and leaves only assertions on.
+    ENABLE_TESTABILITY: "YES"
+  configs:
+    Debug:
+      SWIFT_OPTIMIZATION_LEVEL: "-O"
+      SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+      GCC_OPTIMIZATION_LEVEL: "s"
+    Release:
+      SWIFT_OPTIMIZATION_LEVEL: "-O"
+      SWIFT_COMPILATION_MODE: wholemodule
+      VALIDATE_PRODUCT: "YES"
+
+targets:
+  SkyRunner:
+    type: application
+    platform: iOS
+    sources:
+      # Engine and game code. Globbed, so new files are picked up by
+      # `make project` with no edit to this file.
+      - App
+      - Core
+      - Actors
+      - Scenes
+      - World
+      - FX
+      - Monetization
+      - FriezeKit
+      # Art and audio. Every loader resolves resources *flat*
+      # (`Bundle.main.url(forResource:withExtension:)`, `UIImage(named:)`), so
+      # these must be added as individual files — a folder reference would copy
+      # the directory tree and every lookup would miss at runtime.
+      - path: Assets
+        excludes:
+          - "**/*_preview.png"    # tool output, not shipped art
+          - "**/*_scene.png"
+          - "**/*_ingest.png"
+          - "**/*.spec.json"      # generator input, not a shipped scene
+          - "**/*.artspec.json"   # ditto, for characters
+          - "**/*_legacy.json"    # superseded rigs, kept for reference only
+          - "content.json"        # the cook manifest: a build record, not content
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.skyrunner.game
+        INFOPLIST_FILE: App/Info.plist
+        TARGETED_DEVICE_FAMILY: "1,2"
+        # Landscape only: the scene is authored at 844×390 and `.aspectFill`
+        # crops rather than letterboxes, so portrait would cut the level in half.
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: >-
+          UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+        # Simulator builds must work on a clean machine with no signing identity.
+        CODE_SIGN_IDENTITY: ""
+        CODE_SIGNING_REQUIRED: "NO"
+        CODE_SIGNING_ALLOWED: "NO"
+        ASSETCATALOG_COMPILER_APPICON_NAME: ""
+        GENERATE_INFOPLIST_FILE: "NO"
+        # iPhone and iPad only, deliberately and enforced.
+        #
+        # Not an oversight — a constraint. The whole presentation is built on a
+        # 844×390 scene scaled `.aspectFill`, on-screen touch controls, and asset
+        # densities derived from iOS screen scales (see `ASSET_DENSITY`). Mac and
+        # tvOS would each need a different input model and a different density
+        # policy, and a half-supported platform is worse than an unsupported one.
+        # `TARGETED_DEVICE_FAMILY: "1,2"` above is iPhone + iPad; these switch off
+        # every path Xcode would otherwise offer.
+        SUPPORTS_MACCATALYST: "NO"
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: "NO"
+        SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: "NO"
+        # Device builds need a team; left empty so a clean machine can still build
+        # for the simulator. `DEVELOPMENT_TEAM=XXXX make archive` fills it in.
+        DEVELOPMENT_TEAM: "$(SKYRUNNER_TEAM)"
+
+  SkyRunnerTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - Tests
+    dependencies:
+      - target: SkyRunner
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.skyrunner.game.tests
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/SkyRunner.app/SkyRunner"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        TEST_TARGET_NAME: SkyRunner
+        CODE_SIGN_IDENTITY: ""
+        CODE_SIGNING_REQUIRED: "NO"
+        CODE_SIGNING_ALLOWED: "NO"
+        GENERATE_INFOPLIST_FILE: "YES"
+
+schemes:
+  SkyRunner:
+    build:
+      targets:
+        SkyRunner: all
+        SkyRunnerTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      gatherCoverageData: false
+      targets:
+        - SkyRunnerTests
+    profile:
+      config: Release
+    archive:
+      config: Release

@@ -1,0 +1,85 @@
+{
+ "format": "behaviour/1",
+ "name": "sentry",
+ "initial": "scan",
+ "states": [
+  {
+   "name": "scan",
+   "action": {
+    "do": "wait"
+   },
+   "clip": "idle"
+  },
+  {
+   "name": "aim",
+   "action": {
+    "do": "telegraph"
+   },
+   "clip": "idle",
+   "flash": true
+  },
+  {
+   "name": "fire",
+   "action": {
+    "do": "shoot",
+    "speed": 300,
+    "cooldown": 1.1
+   },
+   "clip": "punch"
+  },
+  {
+   "name": "back",
+   "action": {
+    "do": "retreat",
+    "speed": 110
+   },
+   "clip": "run"
+  }
+ ],
+ "transitions": [
+  {
+   "from": "scan",
+   "to": "aim",
+   "when": {
+    "all": [
+     {
+      "playerWithin": 360
+     },
+     {
+      "facingPlayer": true
+     }
+    ]
+   }
+  },
+  {
+   "from": "aim",
+   "to": "fire",
+   "when": {
+    "stateTime": 0.4
+   },
+   "minimumTime": 0.4
+  },
+  {
+   "from": "fire",
+   "to": "back",
+   "when": {
+    "playerWithin": 90
+   },
+   "priority": 20
+  },
+  {
+   "from": "back",
+   "to": "scan",
+   "when": {
+    "playerBeyond": 180
+   }
+  },
+  {
+   "from": "fire",
+   "to": "scan",
+   "when": {
+    "playerBeyond": 400
+   }
+  }
+ ]
+}

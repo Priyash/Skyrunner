@@ -1,0 +1,188 @@
+{
+ "focus": 0.6,
+ "haze": 0.55,
+ "dofPointsPerDepth": 5.0,
+ "sky": [
+  [
+   186,
+   206,
+   220
+  ],
+  [
+   232,
+   240,
+   248
+  ],
+  [
+   156,
+   188,
+   218
+  ],
+  [
+   86,
+   132,
+   182
+  ],
+  [
+   40,
+   74,
+   128
+  ]
+ ],
+ "layers": [
+  {
+   "image": "ridge_backdrop_glow0",
+   "x": 0.0,
+   "y": -10.0,
+   "depth": 0.05,
+   "tile": false,
+   "density": 2.25
+  },
+  {
+   "image": "ridge_backdrop_ridge1",
+   "x": 0.0,
+   "y": -168.0,
+   "depth": 0.18,
+   "tile": true,
+   "density": 2.25
+  },
+  {
+   "image": "ridge_backdrop_canopy2",
+   "x": 0.0,
+   "y": 152.0,
+   "depth": 0.3,
+   "tile": true,
+   "density": 2.25
+  },
+  {
+   "image": "ridge_backdrop_fog3",
+   "x": 0.0,
+   "y": -120.0,
+   "depth": 0.4,
+   "tile": true,
+   "density": 2.75
+  },
+  {
+   "image": "ridge_backdrop_trunks4",
+   "x": 0.0,
+   "y": 0.0,
+   "depth": 0.52,
+   "tile": true,
+   "density": 3.25,
+   "props": [
+    {
+     "image": "prop_ridge_trunk",
+     "count": 7,
+     "span": 680,
+     "y": -60,
+     "yJitter": 26,
+     "scale": 1.0,
+     "scaleJitter": 0.28,
+     "flipChance": 0.5,
+     "seed": 4177,
+     "density": 6.0
+    },
+    {
+     "image": "prop_ridge_crystal",
+     "count": 4,
+     "span": 680,
+     "y": -78,
+     "yJitter": 26,
+     "scale": 0.88,
+     "scaleJitter": 0.28,
+     "flipChance": 0.5,
+     "seed": 5708,
+     "density": 6.0
+    },
+    {
+     "image": "prop_ridge_rock",
+     "count": 6,
+     "span": 680,
+     "y": -132,
+     "yJitter": 10,
+     "scale": 0.9,
+     "scaleJitter": 0.34,
+     "flipChance": 0.5,
+     "seed": 8021,
+     "density": 6.0
+    }
+   ],
+   "frises": [
+    {
+     "points": [
+      [
+       -80,
+       60
+      ],
+      [
+       200,
+       118
+      ],
+      [
+       430,
+       76
+      ],
+      [
+       660,
+       126
+      ],
+      [
+       860,
+       70
+      ]
+     ],
+     "thickness": 110,
+     "capHeight": 0,
+     "color": [
+      166,
+      182,
+      198
+     ]
+    }
+   ]
+  },
+  {
+   "image": "ridge_backdrop_canopy5",
+   "x": 0.0,
+   "y": 170.0,
+   "depth": 0.62,
+   "tile": true,
+   "density": 3.75,
+   "props": [
+    {
+     "image": "prop_ridge_bush",
+     "count": 9,
+     "span": 460,
+     "y": -80,
+     "yJitter": 18,
+     "scale": 1.1,
+     "scaleJitter": 0.3,
+     "flipChance": 0.5,
+     "seed": 991,
+     "density": 6.0
+    },
+    {
+     "image": "prop_ridge_crystal",
+     "count": 7,
+     "span": 460,
+     "y": -120,
+     "yJitter": 18,
+     "scale": 1.0,
+     "scaleJitter": 0.3,
+     "flipChance": 0.5,
+     "seed": 3307,
+     "density": 6.0
+    }
+   ]
+  },
+  {
+   "image": "ridge_backdrop_vines6",
+   "x": 0.0,
+   "y": 115.0,
+   "depth": 0.88,
+   "tile": true,
+   "density": 2.25
+  }
+ ],
+ "vignette": 0.3
+}

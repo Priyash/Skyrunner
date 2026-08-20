@@ -1,0 +1,47 @@
+{
+ "format": "levels/1",
+ "levels": [
+  {
+   "name": "grove",
+   "order": 10,
+   "title": "Sunlit Grove",
+   "cols": 46,
+   "rows": 9
+  },
+  {
+   "name": "hollow",
+   "order": 20,
+   "title": "Thorn Hollow",
+   "cols": 48,
+   "rows": 9
+  },
+  {
+   "name": "ridge",
+   "order": 30,
+   "title": "Canopy Ridge",
+   "cols": 50,
+   "rows": 9
+  },
+  {
+   "name": "bluffs",
+   "order": 35,
+   "title": "Wind Bluffs",
+   "cols": 22,
+   "rows": 9
+  },
+  {
+   "name": "arena",
+   "order": 40,
+   "title": "King Blob",
+   "cols": 30,
+   "rows": 9
+  },
+  {
+   "name": "gauntlet",
+   "order": 45,
+   "title": "The Gauntlet",
+   "cols": 46,
+   "rows": 9
+  }
+ ]
+}

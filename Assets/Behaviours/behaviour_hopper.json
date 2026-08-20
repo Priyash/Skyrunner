@@ -1,0 +1,70 @@
+{
+ "format": "behaviour/1",
+ "name": "hopper",
+ "initial": "crouch",
+ "states": [
+  {
+   "name": "crouch",
+   "action": {
+    "do": "wait"
+   },
+   "clip": "idle"
+  },
+  {
+   "name": "wind",
+   "action": {
+    "do": "telegraph"
+   },
+   "clip": "idle",
+   "flash": true
+  },
+  {
+   "name": "leap",
+   "action": {
+    "do": "leap",
+    "vx": 150,
+    "vy": 520
+   },
+   "clip": "jump"
+  },
+  {
+   "name": "land",
+   "action": {
+    "do": "wait"
+   },
+   "clip": "idle"
+  }
+ ],
+ "transitions": [
+  {
+   "from": "crouch",
+   "to": "wind",
+   "when": {
+    "playerWithin": 260
+   }
+  },
+  {
+   "from": "wind",
+   "to": "leap",
+   "when": {
+    "stateTime": 0.3
+   },
+   "minimumTime": 0.3
+  },
+  {
+   "from": "leap",
+   "to": "land",
+   "when": {
+    "grounded": true
+   },
+   "minimumTime": 0.25
+  },
+  {
+   "from": "land",
+   "to": "crouch",
+   "when": {
+    "stateTime": 0.4
+   }
+  }
+ ]
+}

@@ -1,0 +1,111 @@
+{
+  "format": "art-spec/1",
+  "name": "hero",
+  "style": {
+    "palette": {
+      "skin": [
+        255,
+        148,
+        26
+      ],
+      "cream": [
+        255,
+        237,
+        204
+      ],
+      "shoe": [
+        230,
+        56,
+        46
+      ],
+      "hair": [
+        255,
+        122,
+        20
+      ],
+      "outline": [
+        74,
+        38,
+        12
+      ]
+    },
+    "outline": 2.6,
+    "gloss": 0.55,
+    "rim": 0.34,
+    "grain": 0.09,
+    "lightAngle": 125
+  },
+  "parts": [
+    {
+      "name": "body",
+      "shape": "pill",
+      "size": [
+        26,
+        30
+      ],
+      "color": "skin",
+      "mesh": true
+    },
+    {
+      "name": "head",
+      "shape": "ball",
+      "size": [
+        24,
+        24
+      ],
+      "color": "skin",
+      "face": true,
+      "mesh": true
+    },
+    {
+      "name": "tuft",
+      "shape": "tuft",
+      "size": [
+        14,
+        18
+      ],
+      "color": "hair"
+    },
+    {
+      "name": "hand_l",
+      "shape": "glove",
+      "size": [
+        11,
+        11
+      ],
+      "color": "cream"
+    },
+    {
+      "name": "hand_r",
+      "shape": "glove",
+      "size": [
+        11,
+        11
+      ],
+      "color": "cream"
+    },
+    {
+      "name": "foot_l",
+      "shape": "shoe",
+      "size": [
+        15,
+        9
+      ],
+      "color": "shoe"
+    },
+    {
+      "name": "foot_r",
+      "shape": "shoe",
+      "size": [
+        15,
+        9
+      ],
+      "color": "shoe"
+    }
+  ],
+  "personality": {
+    "bounce": 1.0,
+    "swagger": 1.0,
+    "squash": 1.0
+  }
+}

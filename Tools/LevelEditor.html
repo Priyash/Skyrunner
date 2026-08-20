@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>FriezeKit Level Editor</title>
+<!--
+  Visual level editor for the ASCII tile maps in World/Levels.swift.
+
+  Deliberately the same shape as RigEditor.html: one file, no build step, opens
+  from disk. It knows three things the maps themselves don't say out loud —
+  the tile alphabet, the design rules, and the player's movement envelope — all
+  mirrored from World/LevelRules.swift. Change a rule there, change it here.
+
+  Two exports, because there are two ways into the engine:
+    • Swift block  → paste into Levels.swift (ships with the build)
+    • engine.json  → drop in the app's Documents folder; the running game
+                     applies it through EngineAPI and rebuilds the scene
+-->
+<style>
+  :root {
+    --bg:#15171c; --panel:#1d2027; --line:#2c313b; --ink:#e6e9ef;
+    --muted:#8b93a3; --accent:#ffb020; --accent2:#4aa8ff; --bad:#ff5c6c;
+    --good:#3ddc97;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+         height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+  header { padding:8px 14px; background:var(--panel); border-bottom:1px solid var(--line);
+           display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  h1 { font-size:14px; margin:0 10px 0 0; letter-spacing:.5px; }
+  button, select { background:#262b34; color:var(--ink); border:1px solid var(--line);
+    border-radius:6px; padding:5px 10px; cursor:pointer; font-size:12px; }
+  button:hover { border-color:var(--accent); }
+  button.primary { background:var(--accent); color:#1a1206; border-color:var(--accent);
+                   font-weight:600; }
+  button.on { background:var(--accent2); border-color:var(--accent2); color:#04121f; }
+  .sep { width:1px; height:22px; background:var(--line); margin:0 4px; }
+  main { flex:1; display:flex; min-height:0; }
+  #stage { flex:1; position:relative; overflow:hidden; background:
+      repeating-conic-gradient(#191c22 0% 25%, #1e2229 0% 50%) 50%/28px 28px; }
+  canvas { position:absolute; inset:0; width:100%; height:100%; touch-action:none; }
+  aside { width:308px; background:var(--panel); border-left:1px solid var(--line);
+          display:flex; flex-direction:column; overflow-y:auto; }
+  .sec { padding:10px 12px; border-bottom:1px solid var(--line); }
+  .sec h2 { font-size:11px; text-transform:uppercase; letter-spacing:.8px;
+            color:var(--muted); margin:0 0 8px; display:flex; justify-content:space-between; }
+  .sec h2 em { font-style:normal; text-transform:none; letter-spacing:0; font-size:10px; }
+  .row { display:flex; gap:6px; align-items:center; margin-bottom:6px; }
+  .row label { width:74px; color:var(--muted); font-size:11px; }
+  .row input[type=number], .row input[type=text], .row select {
+    flex:1; background:#12151a; border:1px solid var(--line); color:var(--ink);
+    border-radius:5px; padding:4px 7px; font-size:12px; min-width:0; }
+  #palette { display:grid; grid-template-columns:repeat(2,1fr); gap:5px; }
+  .tile { display:flex; align-items:center; gap:7px; padding:5px 7px; border-radius:6px;
+          cursor:pointer; border:1px solid transparent; background:#12151a; }
+  .tile:hover { border-color:var(--accent); }
+  .tile.sel { border-color:var(--accent2); background:#1b2732; }
+  .swatch { width:16px; height:16px; border-radius:3px; flex-shrink:0;
+            display:grid; place-items:center; font:700 10px/1 monospace; color:#0b0d11; }
+  .tile b { font-weight:600; font-size:11px; }
+  .tile small { color:var(--muted); font-size:10px; }
+  #issues { max-height:200px; overflow:auto; }
+  .issue { padding:5px 7px; border-radius:5px; background:#241a1d; color:#ffc9ce;
+           font-size:11px; margin-bottom:4px; cursor:pointer;
+           border-left:3px solid var(--bad); }
+  .issue:hover { background:#2f2024; }
+  .clean { color:var(--good); font-size:11px; }
+  footer { height:30px; background:var(--panel); border-top:1px solid var(--line);
+           display:flex; align-items:center; gap:14px; padding:0 14px;
+           color:var(--muted); font-size:11px; }
+  #status { margin-left:auto; color:var(--muted); font-size:11px; }
+  textarea { width:100%; height:96px; background:#12151a; color:var(--ink);
+             border:1px solid var(--line); border-radius:6px; padding:6px;
+             font:11px/1.4 ui-monospace,Menlo,monospace; resize:vertical; }
+  .hint { color:var(--muted); font-size:11px; }
+  input.meta {
+    background: #11151c; color: #dfe6f2; border: 1px solid #2b3444;
+    border-radius: 6px; padding: 4px 6px; font: inherit; font-size: 12px;
+  }
+  input.meta:focus { outline: none; border-color: #5b8cff; }
+</style>
+</head>
+<body>
+<header>
+  <h1>LEVEL EDITOR</h1>
+  <button id="tBrush" class="on" title="B">✏︎ Brush</button>
+  <button id="tRect" title="R">▭ Rect</button>
+  <button id="tFill" title="F">◍ Fill</button>
+  <button id="tPick" title="I">⊙ Pick</button>
+  <div class="sep"></div>
+  <button id="btnUndo" title="⌘Z">↶</button>
+  <button id="btnRedo" title="⇧⌘Z">↷</button>
+  <div class="sep"></div>
+  <button id="btnReach" title="Reachability overlay">◈ Reach</button>
+  <button id="btnFrame" title="Show the camera's 844×390 viewport">▢ Screen</button>
+  <div class="sep"></div>
+  <select id="levelPick" title="Level files on disk, or levels from a pasted Levels.swift"></select>
+  <button id="btnImport">Import…</button>
+  <div class="sep"></div>
+  <input id="lvName"  class="meta" size="8"  placeholder="name"  title="File stem: lowercase, digits, - or _">
+  <input id="lvTitle" class="meta" size="12" placeholder="title" title="Shown on the menu">
+  <input id="lvOrder" class="meta" size="3"  placeholder="10"    title="Play order — sparse, so you can insert between levels">
+  <button id="btnSave" class="primary" title="Write Assets/Levels/&lt;name&gt;.json through the bridge">💾 Save</button>
+  <div class="sep"></div>
+  <button id="btnLive" title="Apply to the running game now, without a rebuild">⚡ Live</button>
+  <button id="btnSwift">Copy Swift</button>
+  <button id="btnEngine">engine.json</button>
+  <span id="status">ready</span>
+</header>
+
+<main>
+  <div id="stage"><canvas id="cv"></canvas></div>
+  <aside>
+    <!-- ── AI generation ───────────────────────────────────────────────
+         The editor is a static file, so it never holds an API key. It talks
+         to the loopback bridge (`python3 ai_director.py serve`), which owns
+         the key, constrains the model to this build's published vocabulary,
+         and validates the result before handing it back. -->
+    <div class="sec">
+      <h2>Generate <em id="bridgeState" class="hint">checking bridge…</em></h2>
+      <textarea id="aiBrief" placeholder="a windy cliff level with three jumps, spikes and a boss at dusk"></textarea>
+      <div class="row" style="margin-top:6px">
+        <button id="btnAI" class="primary">✦ Generate level</button>
+        <button id="btnAIInstall" title="Send the current map to the running game">▶ To game</button>
+      </div>
+      <div id="aiNote" class="hint"></div>
+    </div>
+
+    <div class="sec">
+      <h2>Palette <span class="hint" id="palHint">1…9, 0</span></h2>
+      <div id="palette"></div>
+    </div>
+
+    <div class="sec">
+      <h2>Level</h2>
+      <div class="row"><label>Columns</label><input type="number" id="cols" min="4" max="512"></div>
+      <div class="row"><label>Rows</label><input type="number" id="rows" min="4" max="64"></div>
+      <div class="row"><label>Zoom</label><input type="number" id="zoom" min="4" max="64" step="2"></div>
+      <div class="row">
+        <button id="btnClear">Clear</button>
+        <button id="btnFloor">Add floor</button>
+        <button id="btnTrim">Trim right</button>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h2>Rules <span class="hint" id="ruleCount"></span></h2>
+      <div id="issues"></div>
+    </div>
+
+    <div class="sec">
+      <h2>Import</h2>
+      <p class="hint">Paste a <code>Levels.swift</code> block, an engine.json
+         document, or raw rows — then press Parse.</p>
+      <textarea id="importBox" placeholder='[
+  "..S......F....",
+  "XXXXXXXXXXXXXX",
+]'></textarea>
+      <div class="row" style="margin-top:6px">
+        <button id="btnParse">Parse</button>
+        <span class="hint" id="parseInfo"></span>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h2>Legend</h2>
+      <div id="legend" class="hint"></div>
+    </div>
+  </aside>
+</main>
+
+<footer>
+  <span id="coords">—</span>
+  <span class="hint">drag = paint · ⇧drag = rect · space+drag / middle = pan · wheel = zoom</span>
+  <span id="counts" style="margin-left:auto"></span>
+</footer>
+
+<script>
+// ─── tile table (mirrors World/LevelRules.swift) ──────────────────────────
+const TILES = [
+  {s:'.', name:'empty',    color:'#12151a', ground:false, air:false, uniq:false, note:'air'},
+  {s:'X', name:'ground',   color:'#8a5a34', ground:false, air:false, uniq:false, note:'solid; runs merge'},
+  {s:'P', name:'one-way',  color:'#6fd97a', ground:false, air:true,  uniq:false, note:'jump up through'},
+  {s:'M', name:'mover',    color:'#4fbf7a', ground:false, air:true,  uniq:false, note:'sine platform'},
+  {s:'D', name:'crate',    color:'#c08a4a', ground:true,  air:false, uniq:false, note:'breakable'},
+  {s:'C', name:'coin',     color:'#ffd21e', ground:false, air:false, uniq:false, note:'pickup'},
+  {s:'S', name:'spawn',    color:'#4aa8ff', ground:true,  air:false, uniq:true,  note:'exactly one'},
+  {s:'F', name:'goal',     color:'#3ddc97', ground:true,  air:false, uniq:true,  note:'one, or a boss'},
+  {s:'E', name:'enemy',    color:'#9e59f2', ground:true,  air:false, uniq:false, note:'patrols'},
+  {s:'N', name:'villager', color:'#ff9ecb', ground:true,  air:false, uniq:false, note:'friendly'},
+  {s:'B', name:'bird',     color:'#7fd7ff', ground:true,  air:false, uniq:false, note:'flees'},
+  {s:'K', name:'boss',     color:'#ff5c6c', ground:true,  air:false, uniq:true,  note:'King Blob'},
+  {s:'^', name:'crystal',  color:'#c9a7ff', ground:true,  air:false, uniq:false, note:'hazard'},
+  {s:'/', name:'slope ↗',  color:'#9a6a3c', ground:false, air:false, uniq:false, note:'run up it'},
+  {s:'\\', name:'slope ↖', color:'#9a6a3c', ground:false, air:false, uniq:false, note:'run up it'},
+  {s:'>', name:'belt →',   color:'#63c98a', ground:false, air:false, uniq:false, note:'carries you right'},
+  {s:'<', name:'belt ←',   color:'#63c98a', ground:false, air:false, uniq:false, note:'carries you left'},
+  {s:'!', name:'spring',   color:'#ffc44d', ground:true,  air:false, uniq:false, note:'launches ~8 tiles'},
+  {s:'L', name:'vine',     color:'#4aa05a', ground:false, air:false, uniq:false, note:'climbable'},
+  {s:'~', name:'updraft',  color:'#9fd8ff', ground:false, air:false, uniq:false, note:'lifts you'},
+  {s:'@', name:'checkpoint',color:'#4a86ff',ground:true,  air:false, uniq:false, note:'respawn here'},
+  {s:'#', name:'crusher',  color:'#b9bcc7', ground:false, air:true,  uniq:false, note:'drops on a cycle'},
+];
+const BY_SYM = Object.fromEntries(TILES.map(t => [t.s, t]));
+const SOLID = new Set(['X','D','M','P','/','\\','>','<','!']);
+const LIFTS = new Set(['L','~','!']);
+const passable = s => s !== 'X' && s !== 'D';
+// Movement envelope — jumpVelocity 880 @ gravity −18 ≈ 3.5 tiles up, 4.2 across;
+// a dash adds ~2.5 tiles, a spring throws ~8.5 tiles up.
+const MAX_UP = 3, MAX_ACROSS = 4, MAX_DROP = 5, MAX_DASH = 7, MAX_SPRING_UP = 8;
+const TILE_PT = 40, SCENE_W = 844, SCENE_H = 390;
+
+// ─── state ───────────────────────────────────────────────────────────────
+const state = {
+  rows: [],
+  tool: 'brush',
+  sym: 'X',
+  zoom: 22,
+  pan: {x: 24, y: 24},
+  undo: [], redo: [],
+  reach: false, frame: false,
+  hover: null,
+  drag: null,
+  parsed: [],          // levels found in a pasted Levels.swift
+};
+
+function blank(cols, rowsN) {
+  const out = [];
+  for (let r = 0; r < rowsN; r++) out.push('.'.repeat(cols));
+  return out;
+}
+
+// Presentation the level file carries. Empty means "whatever the game defaults
+// to", which is what every level did before levels were files.
+state.frieze = '';
+state.timeOfDay = undefined;
+
+state.rows = (() => {
+  const rows = blank(46, 9);
+  rows[8] = 'X'.repeat(46);
+  rows[7] = '..S' + '.'.repeat(40) + 'F..';
+  return rows.map(r => r.slice(0, 46).padEnd(46, '.'));
+})();
+
+// ─── model helpers ───────────────────────────────────────────────────────
+const cols = () => state.rows.reduce((m, r) => Math.max(m, r.length), 0);
+const rowCount = () => state.rows.length;
+function at(c, r) {
+  if (r < 0 || r >= state.rows.length) return '.';
+  const row = state.rows[r];
+  return (c < 0 || c >= row.length) ? '.' : row[c];
+}
+function put(c, r, sym) {
+  if (r < 0 || r >= state.rows.length || c < 0 || c >= cols()) return false;
+  if (at(c, r) === sym) return false;
+  const row = state.rows[r].padEnd(cols(), '.');
+  state.rows[r] = row.slice(0, c) + sym + row.slice(c + 1);
+  return true;
+}
+/// Uniqueness is a rule, so enforce it while painting rather than reporting it.
+function putUnique(c, r, sym) {
+  const tile = BY_SYM[sym];
+  if (tile && tile.uniq) {
+    state.rows = state.rows.map(row => row.split('').map(ch => ch === sym ? '.' : ch).join(''));
+  }
+  return put(c, r, sym);
+}
+
+function pushUndo() {
+  state.undo.push(state.rows.slice());
+  if (state.undo.length > 120) state.undo.shift();
+  state.redo.length = 0;
+}
+function undo() {
+  if (!state.undo.length) return;
+  state.redo.push(state.rows.slice());
+  state.rows = state.undo.pop();
+  refresh();
+}
+function redo() {
+  if (!state.redo.length) return;
+  state.undo.push(state.rows.slice());
+  state.rows = state.redo.pop();
+  refresh();
+}
+
+function resize(newCols, newRows) {
+  newCols = Math.max(4, Math.min(512, newCols | 0));
+  newRows = Math.max(4, Math.min(64, newRows | 0));
+  pushUndo();
+  const out = [];
+  for (let r = 0; r < newRows; r++) {
+    const src = state.rows[r] || '';
+    out.push(src.slice(0, newCols).padEnd(newCols, '.'));
+  }
+  state.rows = out;
+  refresh();
+}
+
+// ─── rules (mirrors LevelRules.validate) ─────────────────────────────────
+function positions() {
+  const map = {};
+  for (let r = 0; r < rowCount(); r++)
+    for (let c = 0; c < cols(); c++) {
+      const ch = at(c, r);
+      if (ch !== '.') (map[ch] = map[ch] || []).push([c, r]);
+    }
+  return map;
+}
+
+function standable(c, r) {
+  if (c < 0 || c >= cols() || r < 0 || r >= rowCount()) return false;
+  if (!passable(at(c, r))) return false;
+  if (LIFTS.has(at(c, r))) return true;
+  return SOLID.has(at(c, r + 1));
+}
+
+/// Optimistic flood fill from the spawn: it can call an impossible level
+/// possible, never the reverse. A validator that cried wolf would be ignored.
+function reachableSet() {
+  const pos = positions();
+  if (!pos['S']) return null;
+  const [sc, sr] = pos['S'][0];
+  let origin = null;
+  for (let dr = 0; dr <= 3; dr++) if (standable(sc, sr + dr)) { origin = [sc, sr + dr]; break; }
+  if (!origin) return new Set();
+  const key = (c, r) => r * (cols() + 1) + c;
+  const seen = new Set([key(origin[0], origin[1])]);
+  const stack = [origin];
+  while (stack.length) {
+    const [c, r] = stack.pop();
+    const next = [];
+    for (const dc of [-1, 1]) if (standable(c + dc, r)) next.push([c + dc, r]);
+    for (let dr = 0; dr <= MAX_UP; dr++)
+      for (let dc = -MAX_ACROSS; dc <= MAX_ACROSS; dc++)
+        if (standable(c + dc, r - dr)) next.push([c + dc, r - dr]);
+    for (let dr = 0; dr <= 1; dr++)                       // dash
+      for (let dc = -MAX_DASH; dc <= MAX_DASH; dc++)
+        if (standable(c + dc, r - dr)) next.push([c + dc, r - dr]);
+    if (at(c, r + 1) === '!' || at(c, r) === '!')          // spring
+      for (let dr = 1; dr <= MAX_SPRING_UP; dr++)
+        for (let dc = -MAX_ACROSS; dc <= MAX_ACROSS; dc++)
+          if (standable(c + dc, r - dr)) next.push([c + dc, r - dr]);
+    if (LIFTS.has(at(c, r))) {                             // vine / updraft
+      let rr = r;
+      while (rr > 0 && LIFTS.has(at(c, rr - 1))) {
+        rr--;
+        next.push([c, rr]);
+        for (const dc of [-1, 1]) if (standable(c + dc, rr)) next.push([c + dc, rr]);
+      }
+    }
+    for (const dc of [-1, 1]) if (LIFTS.has(at(c + dc, r))) next.push([c + dc, r]);
+    for (let dc = -MAX_DROP; dc <= MAX_DROP; dc++) {
+      const cc = c + dc;
+      if (cc < 0 || cc >= cols()) continue;
+      for (let rr = r + 1; rr < rowCount(); rr++) {
+        if (standable(cc, rr)) { next.push([cc, rr]); break; }
+        if (SOLID.has(at(cc, rr))) break;
+      }
+    }
+    for (const [nc, nr] of next) {
+      const k = key(nc, nr);
+      if (!seen.has(k)) { seen.add(k); stack.push([nc, nr]); }
+    }
+  }
+  return seen;
+}
+
+function validate() {
+  const out = [];
+  const pos = positions();
+  const add = (msg, cell) => out.push({msg, cell});
+
+  const spawns = (pos['S'] || []).length;
+  if (!spawns) add('no spawn: add exactly one S', null);
+  if (spawns > 1) add(spawns + ' spawns: exactly one S is allowed', pos['S'][1]);
+  const goals = (pos['F'] || []).length, bosses = (pos['K'] || []).length;
+  if (!goals && !bosses) add('no exit: add one F, or one K for a boss level', null);
+  if (goals > 1) add(goals + ' goals: exactly one F is allowed', pos['F'][1]);
+  if (bosses > 1) add(bosses + ' bosses: exactly one K is allowed', pos['K'][1]);
+  if (goals && bosses) add('boss levels have no static F — the portal appears when K falls',
+                           pos['K'][0]);
+
+  for (const t of TILES) {
+    if (!t.ground && !t.air) continue;
+    for (const [c, r] of pos[t.s] || []) {
+      const below = r + 1;
+      if (t.ground) {
+        if (below >= rowCount()) { add(`${t.name} at (${c},${r}) is on the bottom row`, [c, r]); continue; }
+        if (!SOLID.has(at(c, below))) add(`${t.name} at (${c},${r}) has no ground below`, [c, r]);
+      }
+      if (t.air && below < rowCount() && SOLID.has(at(c, below)))
+        add(`${t.name} at (${c},${r}) sits on ground — platforms must hang`, [c, r]);
+    }
+  }
+  for (const [c, r] of pos['^'] || []) {
+    for (const dr of [1, 2]) {
+      if (r - dr >= 0 && SOLID.has(at(c, r - dr))) {
+        add(`crystal at (${c},${r}) has a ceiling ${dr} tile(s) above — unjumpable`, [c, r]);
+        break;
+      }
+    }
+  }
+  // Interior floor gaps only: a trailing pit is a design choice.
+  const floor = rowCount() - 1;
+  let run = 0, saw = false;
+  for (let c = 0; c < cols(); c++) {
+    if (SOLID.has(at(c, floor))) {
+      if (saw && run > MAX_DASH - 1)
+        add(`floor gap of ${run} tiles at column ${c - run} — ${MAX_DASH - 1} is the most a dash can clear`,
+            [c - run, floor]);
+      saw = true; run = 0;
+    } else if (saw) run++;
+  }
+  // Reachability.
+  const exit = (pos['F'] || pos['K'] || [])[0];
+  if (exit && pos['S']) {
+    const set = reachableSet();
+    if (set) {
+      const key = (c, r) => r * (cols() + 1) + c;
+      let ok = false;
+      for (let dc = -1; dc <= 1 && !ok; dc++)
+        for (let dr = -1; dr <= 1 && !ok; dr++)
+          if (set.has(key(exit[0] + dc, exit[1] + dr))) ok = true;
+      if (!ok) add(`exit at (${exit[0]},${exit[1]}) is not reachable from the spawn`, exit);
+    }
+  }
+  return out;
+}
+
+// ─── drawing ─────────────────────────────────────────────────────────────
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const $ = id => document.getElementById(id);
+
+function fitCanvas() {
+  const r = cv.parentElement.getBoundingClientRect();
+  cv.width = r.width * devicePixelRatio;
+  cv.height = r.height * devicePixelRatio;
+  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  draw();
+}
+window.addEventListener('resize', fitCanvas);
+
+const sx = c => state.pan.x + c * state.zoom;
+const sy = r => state.pan.y + r * state.zoom;
+function cellAt(mx, my) {
+  return [Math.floor((mx - state.pan.x) / state.zoom),
+          Math.floor((my - state.pan.y) / state.zoom)];
+}
+
+function draw() {
+  const w = cv.width / devicePixelRatio, h = cv.height / devicePixelRatio;
+  const z = state.zoom;
+  ctx.clearRect(0, 0, w, h);
+
+  // level bounds
+  ctx.fillStyle = '#0e1014';
+  ctx.fillRect(sx(0), sy(0), cols() * z, rowCount() * z);
+
+  const reach = state.reach ? reachableSet() : null;
+  const key = (c, r) => r * (cols() + 1) + c;
+
+  for (let r = 0; r < rowCount(); r++) {
+    for (let c = 0; c < cols(); c++) {
+      const ch = at(c, r);
+      const x = sx(c), y = sy(r);
+      if (ch === 'X') {
+        ctx.fillStyle = '#7d5230';
+        ctx.fillRect(x, y, z, z);
+        // grass cap when nothing solid sits directly above
+        if (!SOLID.has(at(c, r - 1))) {
+          ctx.fillStyle = '#4fae4a';
+          ctx.fillRect(x, y, z, Math.max(2, z * 0.22));
+        }
+      } else if (ch !== '.') {
+        drawGlyph(ch, x, y, z);
+      }
+      if (reach && standable(c, r)) {
+        ctx.fillStyle = reach.has(key(c, r)) ? 'rgba(61,220,151,0.20)'
+                                            : 'rgba(255,92,108,0.26)';
+        ctx.fillRect(x, y, z, z);
+      }
+    }
+  }
+
+  // grid
+  ctx.lineWidth = 1;
+  for (let c = 0; c <= cols(); c++) {
+    ctx.strokeStyle = c % 5 === 0 ? 'rgba(255,255,255,0.13)' : 'rgba(255,255,255,0.05)';
+    ctx.beginPath(); ctx.moveTo(sx(c), sy(0)); ctx.lineTo(sx(c), sy(rowCount())); ctx.stroke();
+  }
+  for (let r = 0; r <= rowCount(); r++) {
+    ctx.strokeStyle = r % 5 === 0 ? 'rgba(255,255,255,0.13)' : 'rgba(255,255,255,0.05)';
+    ctx.beginPath(); ctx.moveTo(sx(0), sy(r)); ctx.lineTo(sx(cols()), sy(r)); ctx.stroke();
+  }
+
+  // rect-tool preview
+  if (state.drag && state.drag.mode === 'rect') {
+    const {a, b} = state.drag;
+    const c0 = Math.min(a[0], b[0]), r0 = Math.min(a[1], b[1]);
+    const c1 = Math.max(a[0], b[0]), r1 = Math.max(a[1], b[1]);
+    ctx.strokeStyle = '#ffb020'; ctx.lineWidth = 2;
+    ctx.strokeRect(sx(c0), sy(r0), (c1 - c0 + 1) * z, (r1 - r0 + 1) * z);
+  }
+
+  // hovered cell + camera viewport
+  if (state.hover) {
+    const [c, r] = state.hover;
+    ctx.strokeStyle = '#4aa8ff'; ctx.lineWidth = 2;
+    ctx.strokeRect(sx(c) + 1, sy(r) + 1, z - 2, z - 2);
+    if (state.frame) {
+      const fw = SCENE_W / TILE_PT * z, fh = SCENE_H / TILE_PT * z;
+      ctx.strokeStyle = 'rgba(255,176,32,0.75)';
+      ctx.setLineDash([6, 4]);
+      ctx.strokeRect(sx(c) + z / 2 - fw / 2, sy(r) + z / 2 - fh / 2, fw, fh);
+      ctx.setLineDash([]);
+    }
+  }
+}
+
+function drawGlyph(ch, x, y, z) {
+  const t = BY_SYM[ch];
+  const cx = x + z / 2, cy = y + z / 2, rad = z * 0.32;
+  ctx.save();
+  switch (ch) {
+    case 'C':
+      ctx.fillStyle = '#ffd21e';
+      ctx.beginPath(); ctx.arc(cx, cy, rad * 0.8, 0, 7); ctx.fill();
+      break;
+    case '^':
+      ctx.fillStyle = '#c9a7ff';
+      ctx.beginPath();
+      ctx.moveTo(x + z * 0.15, y + z * 0.9); ctx.lineTo(cx, y + z * 0.1);
+      ctx.lineTo(x + z * 0.85, y + z * 0.9); ctx.closePath(); ctx.fill();
+      break;
+    case 'P': case 'M':
+      ctx.fillStyle = t.color;
+      ctx.fillRect(x + 1, cy - Math.max(2, z * 0.12), z - 2, Math.max(3, z * 0.24));
+      if (ch === 'M') {
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.font = `${Math.max(7, z * 0.34)}px sans-serif`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('↔', cx, cy);
+      }
+      break;
+    case 'D':
+      ctx.fillStyle = '#c08a4a';
+      ctx.fillRect(x + z * 0.1, y + z * 0.1, z * 0.8, z * 0.8);
+      ctx.strokeStyle = '#7a5326'; ctx.lineWidth = 1.5;
+      ctx.strokeRect(x + z * 0.1, y + z * 0.1, z * 0.8, z * 0.8);
+      break;
+    case 'F':
+      ctx.strokeStyle = '#3ddc97'; ctx.lineWidth = Math.max(2, z * 0.12);
+      ctx.beginPath(); ctx.arc(cx, cy, rad, 0, 7); ctx.stroke();
+      break;
+    default: {
+      ctx.fillStyle = t ? t.color : '#888';
+      ctx.beginPath(); ctx.arc(cx, cy, rad, 0, 7); ctx.fill();
+      ctx.fillStyle = '#0b0d11';
+      ctx.font = `700 ${Math.max(8, z * 0.44)}px ui-monospace,monospace`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(ch, cx, cy + 0.5);
+    }
+  }
+  ctx.restore();
+}
+
+// ─── painting ────────────────────────────────────────────────────────────
+function paint(c, r) {
+  if (state.tool === 'pick') {
+    const ch = at(c, r);
+    if (BY_SYM[ch]) { state.sym = ch; renderPalette(); }
+    return;
+  }
+  if (putUnique(c, r, state.sym)) refresh();
+}
+
+function fillRect(a, b, sym) {
+  const c0 = Math.min(a[0], b[0]), r0 = Math.min(a[1], b[1]);
+  const c1 = Math.max(a[0], b[0]), r1 = Math.max(a[1], b[1]);
+  const tile = BY_SYM[sym];
+  if (tile && tile.uniq) { putUnique(c0, r0, sym); return; }
+  for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) put(c, r, sym);
+}
+
+function floodFill(c, r, sym) {
+  const target = at(c, r);
+  if (target === sym) return;
+  const stack = [[c, r]], seen = new Set();
+  while (stack.length) {
+    const [cc, rr] = stack.pop();
+    if (cc < 0 || rr < 0 || cc >= cols() || rr >= rowCount()) continue;
+    const k = rr * (cols() + 1) + cc;
+    if (seen.has(k) || at(cc, rr) !== target) continue;
+    seen.add(k);
+    put(cc, rr, sym);
+    stack.push([cc + 1, rr], [cc - 1, rr], [cc, rr + 1], [cc, rr - 1]);
+  }
+}
+
+let spaceHeld = false;
+cv.addEventListener('pointerdown', e => {
+  const r = cv.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const cell = cellAt(mx, my);
+  if (spaceHeld || e.button === 1) {
+    state.drag = {mode: 'pan', mx, my, pan: {...state.pan}};
+    return;
+  }
+  if (state.tool === 'rect' || e.shiftKey) {
+    state.drag = {mode: 'rect', a: cell, b: cell};
+    draw();
+    return;
+  }
+  if (state.tool === 'fill') {
+    pushUndo(); floodFill(cell[0], cell[1], state.sym); refresh();
+    return;
+  }
+  if (state.tool !== 'pick') pushUndo();
+  state.drag = {mode: 'paint'};
+  paint(cell[0], cell[1]);
+});
+
+cv.addEventListener('pointermove', e => {
+  const r = cv.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const cell = cellAt(mx, my);
+  state.hover = (cell[0] >= 0 && cell[1] >= 0 && cell[0] < cols() && cell[1] < rowCount())
+    ? cell : null;
+  $('coords').textContent = state.hover
+    ? `col ${cell[0]}, row ${cell[1]}  ·  ${BY_SYM[at(cell[0], cell[1])]?.name ?? '—'}`
+    : '—';
+  const d = state.drag;
+  if (d) {
+    if (d.mode === 'pan') {
+      state.pan = {x: d.pan.x + (mx - d.mx), y: d.pan.y + (my - d.my)};
+    } else if (d.mode === 'rect') {
+      d.b = cell;
+    } else if (d.mode === 'paint') {
+      paint(cell[0], cell[1]);
+    }
+  }
+  draw();
+});
+
+window.addEventListener('pointerup', () => {
+  const d = state.drag;
+  if (d && d.mode === 'rect') {
+    pushUndo();
+    fillRect(d.a, d.b, state.sym);
+    state.drag = null;
+    refresh();
+    return;
+  }
+  state.drag = null;
+});
+
+cv.addEventListener('wheel', e => {
+  e.preventDefault();
+  const before = state.zoom;
+  state.zoom = Math.max(4, Math.min(64, Math.round(state.zoom * (e.deltaY < 0 ? 1.12 : 0.89))));
+  // keep the cursor over the same cell
+  const r = cv.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const k = state.zoom / before;
+  state.pan.x = mx - (mx - state.pan.x) * k;
+  state.pan.y = my - (my - state.pan.y) * k;
+  $('zoom').value = state.zoom;
+  draw();
+}, {passive: false});
+
+// ─── panel ───────────────────────────────────────────────────────────────
+function renderPalette() {
+  $('palette').innerHTML = TILES.map((t, i) => `
+    <div class="tile ${t.s === state.sym ? 'sel' : ''}" data-s="${t.s}">
+      <span class="swatch" style="background:${t.color}">${t.s === '.' ? '' : t.s}</span>
+      <span><b>${t.name}</b><br><small>${t.note}</small></span>
+    </div>`).join('');
+  [...$('palette').children].forEach(el => el.onclick = () => {
+    state.sym = el.dataset.s; renderPalette();
+  });
+}
+
+function renderIssues() {
+  const issues = validate();
+  $('ruleCount').textContent = issues.length ? `${issues.length} to fix` : '';
+  $('issues').innerHTML = issues.length
+    ? issues.map((it, i) => `<div class="issue" data-i="${i}">${it.msg}</div>`).join('')
+    : '<div class="clean">✓ every rule satisfied</div>';
+  [...$('issues').children].forEach(el => {
+    if (!el.dataset.i) return;
+    el.onclick = () => {
+      const cell = issues[+el.dataset.i].cell;
+      if (!cell) return;
+      state.hover = cell;
+      // centre the offending tile
+      const r = cv.getBoundingClientRect();
+      state.pan.x = r.width / 2 - (cell[0] + 0.5) * state.zoom;
+      state.pan.y = r.height / 2 - (cell[1] + 0.5) * state.zoom;
+      draw();
+    };
+  });
+}
+
+function renderLegend() {
+  $('legend').innerHTML = TILES.filter(t => t.s !== '.').map(t =>
+    `<code>${t.s}</code> ${t.name}${t.ground ? ' · needs ground' : ''}${t.air ? ' · must hang' : ''}`
+  ).join('<br>');
+}
+
+function renderCounts() {
+  const pos = positions();
+  const parts = Object.keys(pos).sort().map(k => `${k}:${pos[k].length}`);
+  $('counts').textContent = `${cols()}×${rowCount()}  ·  ${parts.join('  ')}`;
+}
+
+function refresh() {
+  $('cols').value = cols();
+  $('rows').value = rowCount();
+  $('zoom').value = state.zoom;
+  renderIssues();
+  renderCounts();
+  draw();
+}
+
+// ─── tools & buttons ─────────────────────────────────────────────────────
+const toolButtons = {brush: 'tBrush', rect: 'tRect', fill: 'tFill', pick: 'tPick'};
+function setTool(name) {
+  state.tool = name;
+  Object.entries(toolButtons).forEach(([k, id]) => $(id).classList.toggle('on', k === name));
+}
+Object.entries(toolButtons).forEach(([k, id]) => $(id).onclick = () => setTool(k));
+
+$('btnUndo').onclick = undo;
+$('btnRedo').onclick = redo;
+$('btnReach').onclick = () => {
+  state.reach = !state.reach;
+  $('btnReach').classList.toggle('on', state.reach);
+  draw();
+};
+$('btnFrame').onclick = () => {
+  state.frame = !state.frame;
+  $('btnFrame').classList.toggle('on', state.frame);
+  draw();
+};
+$('cols').onchange = () => resize(+$('cols').value, rowCount());
+$('rows').onchange = () => resize(cols(), +$('rows').value);
+$('zoom').onchange = () => { state.zoom = Math.max(4, Math.min(64, +$('zoom').value)); draw(); };
+$('btnClear').onclick = () => { pushUndo(); state.rows = blank(cols(), rowCount()); refresh(); };
+$('btnFloor').onclick = () => {
+  pushUndo();
+  state.rows[rowCount() - 1] = 'X'.repeat(cols());
+  refresh();
+};
+$('btnTrim').onclick = () => {
+  // Drop empty columns on the right — generated maps tend to trail air.
+  pushUndo();
+  let last = 0;
+  for (let r = 0; r < rowCount(); r++)
+    for (let c = 0; c < cols(); c++) if (at(c, r) !== '.') last = Math.max(last, c);
+  resize(last + 2, rowCount());
+};
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.code === 'Space') { spaceHeld = true; e.preventDefault(); return; }
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
+    e.preventDefault(); e.shiftKey ? redo() : undo(); return;
+  }
+  const map = {b: 'brush', r: 'rect', f: 'fill', i: 'pick'};
+  if (map[e.key.toLowerCase()]) { setTool(map[e.key.toLowerCase()]); return; }
+  // 1…9,0 pick from the palette
+  const n = '1234567890'.indexOf(e.key);
+  if (n >= 0 && TILES[n + 1]) { state.sym = TILES[n + 1].s; renderPalette(); }
+});
+document.addEventListener('keyup', e => { if (e.code === 'Space') spaceHeld = false; });
+
+// ─── import / export ─────────────────────────────────────────────────────
+/// Accepts a Levels.swift block (one or many levels), an engine.json document,
+/// or bare rows — whatever is on the clipboard.
+function parseImport(text) {
+  const trimmed = text.trim();
+  if (!trimmed) return {levels: [], note: 'nothing to parse'};
+
+  if (trimmed.startsWith('{')) {
+    try {
+      const doc = JSON.parse(trimmed);
+      const rows = (doc.commands || []).filter(c => c.op === 'setLevel')
+        .map(c => c.rows).filter(Array.isArray).pop();
+      if (rows) return {levels: [rows], note: 'engine.json'};
+      return {levels: [], note: 'no setLevel command found'};
+    } catch (err) { return {levels: [], note: 'bad JSON: ' + err.message}; }
+  }
+
+  const legal = new Set(TILES.map(t => t.s));
+  const lines = trimmed.split('\n');
+  const levels = [];
+  let cur = [];
+  for (const raw of lines) {
+    const m = raw.match(/"([^"]*)"/);
+    if (m) {
+      const row = m[1];
+      if (row.length && [...row].every(ch => legal.has(ch))) { cur.push(row); continue; }
+    }
+    if (cur.length) { levels.push(cur); cur = []; }
+  }
+  if (cur.length) levels.push(cur);
+  if (levels.length) return {levels, note: `${levels.length} level(s)`};
+
+  // bare rows, no quotes
+  const bare = lines.map(l => l.trim()).filter(l => l.length && [...l].every(ch => legal.has(ch)));
+  return bare.length ? {levels: [bare], note: 'raw rows'} : {levels: [], note: 'no legal rows found'};
+}
+
+function loadLevel(rows) {
+  const width = rows.reduce((m, r) => Math.max(m, r.length), 0);
+  pushUndo();
+  state.rows = rows.map(r => r.padEnd(width, '.'));
+  refresh();
+}
+
+$('btnImport').onclick = () => $('importBox').focus();
+$('btnParse').onclick = () => {
+  const {levels, note} = parseImport($('importBox').value);
+  $('parseInfo').textContent = note;
+  state.parsed = levels;
+  $('levelPick').innerHTML = levels.map((l, i) =>
+    `<option value="paste:${i}">(pasted) level ${i + 1} `
+    + `(${l[0].length}×${l.length})</option>`).join('') || '<option>—</option>';
+  if (levels.length) { loadLevel(levels[0]); status(`imported ${note}`); }
+};
+$('levelPick').onchange = () => {
+  // Two sources share the picker: files on disk (which the game loads) and
+  // levels pasted out of Levels.swift (which it only falls back to).
+  const value = $('levelPick').value || '';
+  if (value.startsWith('disk:')) return loadDiskLevel(+value.slice(5));
+  const i = value.startsWith('paste:') ? +value.slice(6) : +value;
+  if (state.parsed && state.parsed[i]) loadLevel(state.parsed[i]);
+};
+
+function swiftBlock() {
+  const body = state.rows.map(r => `            "${r}",`).join('\n');
+  return `        // ── generated in Tools/LevelEditor.html ──\n        [\n${body}\n        ],`;
+}
+
+function engineDocument() {
+  return JSON.stringify({
+    version: 1,
+    commands: [{op: 'setLevel', rows: state.rows}],
+  }, null, 1);
+}
+
+function copy(text, what) {
+  navigator.clipboard?.writeText(text).then(
+    () => status(`${what} copied to the clipboard`),
+    () => status(`could not copy — ${what} logged to the console`) || console.log(text));
+}
+$('btnSwift').onclick = () => copy(swiftBlock(), 'Swift block');
+$('btnEngine').onclick = () => {
+  const text = engineDocument();
+  const blob = new Blob([text], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'engine.json';
+  a.click();
+  status('engine.json downloaded — drop it in the app’s Documents folder');
+};
+
+/// The level as a `level/1` document.
+///
+/// This is the whole point of the file format: the editor stops being a thing you
+/// copy out of and becomes the thing that writes the game's content.
+function levelDocument() {
+  const name = ($('lvName').value || '').trim().toLowerCase();
+  const order = parseInt($('lvOrder').value, 10);
+  return {
+    format: 'level/1',
+    name,
+    order: Number.isFinite(order) ? order : 10,
+    title: ($('lvTitle').value || '').trim() || undefined,
+    frieze: state.frieze || undefined,
+    timeOfDay: state.timeOfDay,
+    rows: state.rows,
+  };
+}
+
+$('btnSave').onclick = async () => {
+  const doc = levelDocument();
+  if (!/^[a-z0-9][a-z0-9_-]{0,39}$/.test(doc.name || '')) {
+    return status('give the level a name first (lowercase, digits, - or _)');
+  }
+  try {
+    let res = await bridge('/save', {level: doc});
+    if (res.errors && res.errors.length) {
+      // An order clash is the one refusal worth resolving in place, because the
+      // bridge already worked out a free slot.
+      if (res.suggestOrder && confirm(
+            `${res.errors[0]}\n\nSave as order ${res.suggestOrder} instead?`)) {
+        doc.order = res.suggestOrder;
+        $('lvOrder').value = String(res.suggestOrder);
+        res = await bridge('/save', {level: doc});
+      } else {
+        return status(res.errors[0]);
+      }
+    }
+    const warn = (res.warnings || []).length;
+    status(`${res.replaced ? 'updated' : 'wrote'} ${res.path.split('/').pop()}`
+           + (warn ? ` — ${warn} design warning(s), see the panel` : ''));
+    if (warn) console.warn('design warnings:', res.warnings);
+    await refreshDiskLevels();
+  } catch (e) {
+    status(`bridge not running — start it with "make editor" (${e.message})`);
+  }
+};
+
+/// Apply to the running game immediately. A level file needs a rebuild to enter
+/// the bundle; this is the two-second loop for iterating on shape.
+$('btnLive').onclick = async () => {
+  try {
+    const res = await bridge('/install',
+                             {document: JSON.parse(engineDocument())});
+    status(res.path ? `installed → the game applies it on write` : 'installed');
+  } catch (e) {
+    status(`could not install (${e.message}) — is the bridge running?`);
+  }
+};
+
+/// Levels the game will actually load, newest read wins over a pasted paste.
+let diskLevels = [];
+async function refreshDiskLevels() {
+  try {
+    const res = await bridge('/levels');
+    diskLevels = res.levels || [];
+    const pick = $('levelPick');
+    pick.innerHTML = '';
+    diskLevels.forEach((l, i) => {
+      const opt = document.createElement('option');
+      opt.value = `disk:${i}`;
+      opt.textContent = `${l.order}  ${l.title || l.name}`;
+      pick.appendChild(opt);
+    });
+    (state.parsed || []).forEach((rows, i) => {
+      const opt = document.createElement('option');
+      opt.value = `paste:${i}`;
+      opt.textContent = `(pasted) level ${i + 1}`;
+      pick.appendChild(opt);
+    });
+    if (res.problems && res.problems.length)
+      console.error('level file problems:', res.problems);
+    status(`${diskLevels.length} level file(s) in ${res.dir.split('/').slice(-2).join('/')}`);
+  } catch (e) {
+    // No bridge is a normal state — the editor still works standalone.
+  }
+}
+
+function loadDiskLevel(index) {
+  const l = diskLevels[index];
+  if (!l) return;
+  state.rows = l.rows.slice();
+  state.frieze = l.frieze || '';
+  state.timeOfDay = l.timeOfDay;
+  $('lvName').value = l.name || '';
+  $('lvTitle').value = l.title || '';
+  $('lvOrder').value = String(l.order ?? 10);
+  refresh();
+  status(`loaded ${l.name}`);
+}
+
+let statusTimer = null;
+function status(msg) {
+  $('status').textContent = msg;
+  clearTimeout(statusTimer);
+  statusTimer = setTimeout(() => $('status').textContent = 'ready', 4000);
+}
+
+// ─── AI bridge ───────────────────────────────────────────────────────────
+// One loopback origin, three endpoints. The bridge answers with the offline
+// composer when no API key is present, so this panel works either way — the
+// note tells you which one replied.
+const BRIDGE = 'http://127.0.0.1:8787';
+
+async function bridge(path, body) {
+  const res = await fetch(BRIDGE + path, {
+    method: body ? 'POST' : 'GET',
+    headers: body ? {'Content-Type': 'application/json'} : undefined,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) throw new Error(`bridge ${res.status}`);
+  return res.json();
+}
+
+async function checkBridge() {
+  try {
+    const health = await bridge('/health');
+    $('bridgeState').textContent = health.hasKey
+      ? `${health.model} ready`
+      : 'offline composer (no API key)';
+    $('bridgeState').style.color = health.hasKey ? 'var(--good)' : 'var(--accent)';
+  } catch {
+    $('bridgeState').textContent = 'bridge not running';
+    $('bridgeState').style.color = 'var(--muted)';
+    $('aiNote').textContent = 'start it with:  make editor';
+  }
+  // Listing the level files is the same trip, and it is what makes the picker
+  // show the levels the game will actually load rather than only pasted ones.
+  await refreshDiskLevels();
+}
+
+$('btnAI').onclick = async () => {
+  const brief = $('aiBrief').value.trim();
+  if (!brief) { status('describe the level first'); return; }
+  $('btnAI').disabled = true;
+  $('aiNote').textContent = 'thinking…';
+  try {
+    // Hand the model the map on screen: "add a boss room" should extend this
+    // level, not invent an unrelated one.
+    const result = await bridge('/plan', {
+      brief,
+      context: `The level currently open in the editor is:\n${JSON.stringify(state.rows)}`,
+    });
+    if (result.errors?.length) {
+      $('aiNote').textContent = 'rejected: ' + result.errors[0];
+    } else if (result.rows) {
+      loadLevel(result.rows);
+      const warn = result.warnings?.length ? ` · ${result.warnings.length} rule warning(s)` : '';
+      $('aiNote').textContent = (result.document?.notes || result.note) + warn;
+      status('generated');
+    } else {
+      $('aiNote').textContent = 'no level in the reply (it may have only changed lighting)';
+    }
+  } catch (err) {
+    $('aiNote').textContent = 'bridge not running — python3 ai_director.py serve';
+  } finally {
+    $('btnAI').disabled = false;
+  }
+};
+
+$('btnAIInstall').onclick = async () => {
+  try {
+    const result = await bridge('/install', {document: JSON.parse(engineDocument())});
+    if (result.errors?.length) $('aiNote').textContent = 'rejected: ' + result.errors[0];
+    else { $('aiNote').textContent = 'installed → ' + result.installed; status('sent to the game'); }
+  } catch {
+    $('aiNote').textContent = 'bridge not running — use the engine.json button instead';
+  }
+};
+
+// boot
+renderPalette(); renderLegend(); fitCanvas(); refresh(); checkBridge();
+</script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+{
+ "format": "behaviour/1",
+ "name": "patroller",
+ "initial": "patrol",
+ "states": [
+  {
+   "name": "patrol",
+   "action": {
+    "do": "patrol",
+    "speed": 62
+   },
+   "clip": "run"
+  },
+  {
+   "name": "alert",
+   "action": {
+    "do": "telegraph"
+   },
+   "clip": "idle",
+   "flash": true
+  },
+  {
+   "name": "chase",
+   "action": {
+    "do": "chase",
+    "speed": 128
+   },
+   "clip": "run"
+  },
+  {
+   "name": "recover",
+   "action": {
+    "do": "wait"
+   },
+   "clip": "idle",
+   "dangerous": false
+  }
+ ],
+ "transitions": [
+  {
+   "from": "*",
+   "to": "recover",
+   "when": {
+    "hurt": true
+   },
+   "priority": 90
+  },
+  {
+   "from": "recover",
+   "to": "patrol",
+   "when": {
+    "stateTime": 0.7
+   }
+  },
+  {
+   "from": "patrol",
+   "to": "alert",
+   "when": {
+    "all": [
+     {
+      "playerWithin": 200
+     },
+     {
+      "facingPlayer": true
+     }
+    ]
+   }
+  },
+  {
+   "from": "alert",
+   "to": "chase",
+   "when": {
+    "stateTime": 0.35
+   },
+   "minimumTime": 0.35
+  },
+  {
+   "from": "chase",
+   "to": "patrol",
+   "when": {
+    "playerBeyond": 320
+   }
+  }
+ ]
+}

@@ -1,0 +1,92 @@
+{
+ "format": "behaviour/1",
+ "name": "charger",
+ "initial": "watch",
+ "states": [
+  {
+   "name": "watch",
+   "action": {
+    "do": "patrol",
+    "speed": 40
+   },
+   "clip": "run"
+  },
+  {
+   "name": "wind",
+   "action": {
+    "do": "telegraph"
+   },
+   "clip": "idle",
+   "flash": true
+  },
+  {
+   "name": "charge",
+   "action": {
+    "do": "chase",
+    "speed": 290
+   },
+   "clip": "run"
+  },
+  {
+   "name": "stagger",
+   "action": {
+    "do": "wait"
+   },
+   "clip": "hurt",
+   "dangerous": false
+  }
+ ],
+ "transitions": [
+  {
+   "from": "*",
+   "to": "stagger",
+   "when": {
+    "hurt": true
+   },
+   "priority": 90
+  },
+  {
+   "from": "stagger",
+   "to": "watch",
+   "when": {
+    "stateTime": 0.9
+   }
+  },
+  {
+   "from": "watch",
+   "to": "wind",
+   "when": {
+    "all": [
+     {
+      "playerWithin": 300
+     },
+     {
+      "facingPlayer": true
+     }
+    ]
+   }
+  },
+  {
+   "from": "wind",
+   "to": "charge",
+   "when": {
+    "stateTime": 0.5
+   },
+   "minimumTime": 0.5
+  },
+  {
+   "from": "charge",
+   "to": "stagger",
+   "when": {
+    "any": [
+     {
+      "stateTime": 1.4
+     },
+     {
+      "atEdge": true
+     }
+    ]
+   }
+  }
+ ]
+}

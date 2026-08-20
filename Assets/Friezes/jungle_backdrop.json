@@ -1,0 +1,201 @@
+{
+ "focus": 0.58,
+ "haze": 0.46,
+ "dofPointsPerDepth": 5.0,
+ "sky": [
+  [
+   86,
+   128,
+   92
+  ],
+  [
+   188,
+   214,
+   150
+  ],
+  [
+   120,
+   168,
+   118
+  ],
+  [
+   46,
+   92,
+   78
+  ],
+  [
+   18,
+   44,
+   40
+  ]
+ ],
+ "layers": [
+  {
+   "image": "jungle_backdrop_glow0",
+   "x": 0.0,
+   "y": -10.0,
+   "depth": 0.05,
+   "tile": false,
+   "density": 2.25
+  },
+  {
+   "image": "jungle_backdrop_ridge1",
+   "x": 0.0,
+   "y": -168.0,
+   "depth": 0.18,
+   "tile": true,
+   "density": 2.25
+  },
+  {
+   "image": "jungle_backdrop_canopy2",
+   "x": 0.0,
+   "y": 152.0,
+   "depth": 0.3,
+   "tile": true,
+   "density": 2.25
+  },
+  {
+   "image": "jungle_backdrop_fog3",
+   "x": 0.0,
+   "y": -120.0,
+   "depth": 0.4,
+   "tile": true,
+   "density": 2.75
+  },
+  {
+   "image": "jungle_backdrop_trunks4",
+   "x": 0.0,
+   "y": 0.0,
+   "depth": 0.52,
+   "tile": true,
+   "density": 3.5,
+   "props": [
+    {
+     "image": "prop_jungle_trunk",
+     "count": 7,
+     "span": 680,
+     "y": -60,
+     "yJitter": 26,
+     "scale": 1.0,
+     "scaleJitter": 0.28,
+     "flipChance": 0.5,
+     "seed": 4177,
+     "density": 6.0
+    },
+    {
+     "image": "prop_jungle_palm",
+     "count": 4,
+     "span": 680,
+     "y": -78,
+     "yJitter": 26,
+     "scale": 0.88,
+     "scaleJitter": 0.28,
+     "flipChance": 0.5,
+     "seed": 5708,
+     "density": 6.0
+    }
+   ],
+   "frises": [
+    {
+     "points": [
+      [
+       -80,
+       60
+      ],
+      [
+       200,
+       118
+      ],
+      [
+       430,
+       76
+      ],
+      [
+       660,
+       126
+      ],
+      [
+       860,
+       70
+      ]
+     ],
+     "thickness": 110,
+     "capHeight": 0,
+     "color": [
+      110,
+      158,
+      116
+     ]
+    }
+   ]
+  },
+  {
+   "image": "jungle_backdrop_canopy5",
+   "x": 0.0,
+   "y": 170.0,
+   "depth": 0.62,
+   "tile": true,
+   "density": 3.75,
+   "props": [
+    {
+     "image": "prop_jungle_fern",
+     "count": 9,
+     "span": 460,
+     "y": -80,
+     "yJitter": 18,
+     "scale": 1.1,
+     "scaleJitter": 0.3,
+     "flipChance": 0.5,
+     "seed": 991,
+     "density": 6.0
+    },
+    {
+     "image": "prop_jungle_mushroom",
+     "count": 7,
+     "span": 460,
+     "y": -120,
+     "yJitter": 18,
+     "scale": 1.0,
+     "scaleJitter": 0.3,
+     "flipChance": 0.5,
+     "seed": 3307,
+     "density": 6.0
+    }
+   ]
+  },
+  {
+   "image": "jungle_backdrop_vines6",
+   "x": 0.0,
+   "y": 115.0,
+   "depth": 0.88,
+   "tile": true,
+   "density": 2.25
+  }
+ ],
+ "vignette": 0.3,
+ "rays": {
+  "x": -120,
+  "y": 210,
+  "angles": [
+   -16,
+   -8,
+   4,
+   12
+  ],
+  "color": [
+   226,
+   248,
+   176
+  ],
+  "alpha": 0.16,
+  "width": 46
+ },
+ "fireflies": {
+  "count": 26,
+  "color": [
+   226,
+   248,
+   176
+  ]
+ }
+}

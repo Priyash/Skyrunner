@@ -1,0 +1,1939 @@
+{
+ "format": "content/1",
+ "stamp": "",
+ "totalBytes": 38947854,
+ "categories": {
+  "Audio": 5766792,
+  "Friezes": 28303750,
+  "Levels": 3702,
+  "Rigs": 267790,
+  "Terrain": 4605820
+ },
+ "files": {
+  "Assets/Audio/boss_die.wav": {
+   "bytes": 83834,
+   "sha256": "f641d449adbf0445",
+   "category": "Audio"
+  },
+  "Assets/Audio/boss_hit.wav": {
+   "bytes": 22976,
+   "sha256": "7378c49377a1d8a3",
+   "category": "Audio"
+  },
+  "Assets/Audio/checkpoint.wav": {
+   "bytes": 38852,
+   "sha256": "18f7d4f07d4aca3c",
+   "category": "Audio"
+  },
+  "Assets/Audio/coin.wav": {
+   "bytes": 16360,
+   "sha256": "12eed184a0bfda1d",
+   "category": "Audio"
+  },
+  "Assets/Audio/crusher.wav": {
+   "bytes": 48554,
+   "sha256": "99786c6b2c482e71",
+   "category": "Audio"
+  },
+  "Assets/Audio/dash.wav": {
+   "bytes": 19448,
+   "sha256": "1424dcb9fb46f6b8",
+   "category": "Audio"
+  },
+  "Assets/Audio/hover.wav": {
+   "bytes": 33830,
+   "sha256": "b29c4fb40d4ffbbe",
+   "category": "Audio"
+  },
+  "Assets/Audio/hurt.wav": {
+   "bytes": 26504,
+   "sha256": "10f17e25385d293c",
+   "category": "Audio"
+  },
+  "Assets/Audio/jump.wav": {
+   "bytes": 17684,
+   "sha256": "5b070f16b759dbe6",
+   "category": "Audio"
+  },
+  "Assets/Audio/land.wav": {
+   "bytes": 14156,
+   "sha256": "67c96dab1ca8de6c",
+   "category": "Audio"
+  },
+  "Assets/Audio/menu.wav": {
+   "bytes": 5336,
+   "sha256": "d5790be0d9302ae7",
+   "category": "Audio"
+  },
+  "Assets/Audio/pop.wav": {
+   "bytes": 7982,
+   "sha256": "9b5ee6cf43bc1023",
+   "category": "Audio"
+  },
+  "Assets/Audio/pound.wav": {
+   "bytes": 30032,
+   "sha256": "7ac0135120d44763",
+   "category": "Audio"
+  },
+  "Assets/Audio/spring.wav": {
+   "bytes": 30032,
+   "sha256": "a2fb148d1ec90876",
+   "category": "Audio"
+  },
+  "Assets/Audio/stomp.wav": {
+   "bytes": 15920,
+   "sha256": "2d48c0358421f5fc",
+   "category": "Audio"
+  },
+  "Assets/Audio/theme_arena.wav": {
+   "bytes": 622428,
+   "sha256": "5c8b6d386b986d94",
+   "category": "Audio"
+  },
+  "Assets/Audio/theme_evening.wav": {
+   "bytes": 1122968,
+   "sha256": "d72959a52bb5fb3d",
+   "category": "Audio"
+  },
+  "Assets/Audio/theme_grove.wav": {
+   "bytes": 1016864,
+   "sha256": "1cda3dadb918f036",
+   "category": "Audio"
+  },
+  "Assets/Audio/theme_hollow.wav": {
+   "bytes": 714464,
+   "sha256": "5e0c868b840579f7",
+   "category": "Audio"
+  },
+  "Assets/Audio/theme_menu.wav": {
+   "bytes": 1016864,
+   "sha256": "82dd1fb90f090980",
+   "category": "Audio"
+  },
+  "Assets/Audio/theme_ridge.wav": {
+   "bytes": 792864,
+   "sha256": "383299a1acf617d0",
+   "category": "Audio"
+  },
+  "Assets/Audio/win.wav": {
+   "bytes": 68840,
+   "sha256": "7bb5a3135743a0d7",
+   "category": "Audio"
+  },
+  "Assets/Friezes/cave_backdrop.json": {
+   "bytes": 2501,
+   "sha256": "be01a0ee2ed9781a",
+   "category": "Friezes"
+  },
+  "Assets/Friezes/cave_backdrop_canopy2@2x.png": {
+   "bytes": 195915,
+   "sha256": "72614e900bbd9a34",
+   "category": "Friezes",
+   "pixels": [
+    763,
+    417
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/cave_backdrop_canopy2@3x.png": {
+   "bytes": 338928,
+   "sha256": "8785bb881e99aef6",
+   "category": "Friezes",
+   "pixels": [
+    1144,
+    625
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/cave_backdrop_canopy5@2x.png": {
+   "bytes": 269064,
+   "sha256": "d286001c47868154",
+   "category": "Friezes",
+   "pixels": [
+    1068,
+    513
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/cave_backdrop_canopy5@3x.png": {
+   "bytes": 463357,
+   "sha256": "3211ebc1bf42d618",
+   "category": "Friezes",
+   "pixels": [
+    1602,
+    770
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/cave_backdrop_fog3@2x.png": {
+   "bytes": 86042,
+   "sha256": "2f0209c70d1103dc",
+   "category": "Friezes",
+   "pixels": [
+    1129,
+    275
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/cave_backdrop_fog3@3x.png": {
+   "bytes": 164365,
+   "sha256": "c3731afae0b1cc8e",
+   "category": "Friezes",
+   "pixels": [
+    1694,
+    412
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/cave_backdrop_glow0@2x.png": {
+   "bytes": 235356,
+   "sha256": "a2046296537403d6",
+   "category": "Friezes",
+   "pixels": [
+    1611,
+    585
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/cave_backdrop_glow0@3x.png": {
+   "bytes": 397802,
+   "sha256": "71f088215cff83fa",
+   "category": "Friezes",
+   "pixels": [
+    2417,
+    878
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/cave_backdrop_ridge1@2x.png": {
+   "bytes": 159166,
+   "sha256": "de2d4a6fa6c9f012",
+   "category": "Friezes",
+   "pixels": [
+    1003,
+    600
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/cave_backdrop_ridge1@3x.png": {
+   "bytes": 259539,
+   "sha256": "b7e1ded6e4b914b8",
+   "category": "Friezes",
+   "pixels": [
+    1505,
+    900
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/cave_backdrop_trunks4@2x.png": {
+   "bytes": 382304,
+   "sha256": "315dba21fe0c4ab5",
+   "category": "Friezes",
+   "pixels": [
+    1496,
+    1075
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/cave_backdrop_trunks4@3x.png": {
+   "bytes": 675470,
+   "sha256": "61278eac35d3a1ff",
+   "category": "Friezes",
+   "pixels": [
+    2244,
+    1612
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/cave_backdrop_vines6@2x.png": {
+   "bytes": 245781,
+   "sha256": "addb897b12b04b01",
+   "category": "Friezes",
+   "pixels": [
+    581,
+    450
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/cave_backdrop_vines6@3x.png": {
+   "bytes": 428132,
+   "sha256": "95dab926e6f96b06",
+   "category": "Friezes",
+   "pixels": [
+    872,
+    675
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/forest_backdrop.json": {
+   "bytes": 2684,
+   "sha256": "026c8635d24261e7",
+   "category": "Friezes"
+  },
+  "Assets/Friezes/forest_backdrop_canopy2@2x.png": {
+   "bytes": 200233,
+   "sha256": "c94788dcc757594e",
+   "category": "Friezes",
+   "pixels": [
+    687,
+    375
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/forest_backdrop_canopy2@3x.png": {
+   "bytes": 351775,
+   "sha256": "b59f72bd173ce0f7",
+   "category": "Friezes",
+   "pixels": [
+    1030,
+    562
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/forest_backdrop_canopy5@2x.png": {
+   "bytes": 352640,
+   "sha256": "268298068d3b23f4",
+   "category": "Friezes",
+   "pixels": [
+    1221,
+    587
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/forest_backdrop_canopy5@3x.png": {
+   "bytes": 583866,
+   "sha256": "dd090d3d0e09313f",
+   "category": "Friezes",
+   "pixels": [
+    1831,
+    880
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/forest_backdrop_fog3@2x.png": {
+   "bytes": 64651,
+   "sha256": "fe794d68352667a1",
+   "category": "Friezes",
+   "pixels": [
+    1027,
+    250
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/forest_backdrop_fog3@3x.png": {
+   "bytes": 135169,
+   "sha256": "7317cdde8c097214",
+   "category": "Friezes",
+   "pixels": [
+    1540,
+    375
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/forest_backdrop_glow0@2x.png": {
+   "bytes": 231096,
+   "sha256": "8f3621b07b7c1fa0",
+   "category": "Friezes",
+   "pixels": [
+    1582,
+    585
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/forest_backdrop_glow0@3x.png": {
+   "bytes": 390502,
+   "sha256": "62259225d0799bb8",
+   "category": "Friezes",
+   "pixels": [
+    2373,
+    878
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/forest_backdrop_ridge1@2x.png": {
+   "bytes": 202239,
+   "sha256": "59f244acd03a4eb6",
+   "category": "Friezes",
+   "pixels": [
+    1003,
+    600
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/forest_backdrop_ridge1@3x.png": {
+   "bytes": 339691,
+   "sha256": "bf79522ffea6e6d0",
+   "category": "Friezes",
+   "pixels": [
+    1505,
+    900
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/forest_backdrop_trunks4@2x.png": {
+   "bytes": 306276,
+   "sha256": "cf649f79f89de797",
+   "category": "Friezes",
+   "pixels": [
+    1297,
+    932
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/forest_backdrop_trunks4@3x.png": {
+   "bytes": 542981,
+   "sha256": "157df1d28a8ca093",
+   "category": "Friezes",
+   "pixels": [
+    1945,
+    1398
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/forest_backdrop_vines6@2x.png": {
+   "bytes": 273816,
+   "sha256": "10e5c51ca836d8a4",
+   "category": "Friezes",
+   "pixels": [
+    645,
+    500
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/forest_backdrop_vines6@3x.png": {
+   "bytes": 480267,
+   "sha256": "f91da06473cb0d32",
+   "category": "Friezes",
+   "pixels": [
+    968,
+    750
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/jungle_backdrop.json": {
+   "bytes": 2688,
+   "sha256": "99a1d7dcdfaa99b7",
+   "category": "Friezes"
+  },
+  "Assets/Friezes/jungle_backdrop_canopy2@2x.png": {
+   "bytes": 189975,
+   "sha256": "09c95ad3097854f7",
+   "category": "Friezes",
+   "pixels": [
+    687,
+    375
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/jungle_backdrop_canopy2@3x.png": {
+   "bytes": 332199,
+   "sha256": "674c7f2d4a7d5396",
+   "category": "Friezes",
+   "pixels": [
+    1030,
+    562
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/jungle_backdrop_canopy5@2x.png": {
+   "bytes": 321171,
+   "sha256": "5717a5696bac8d78",
+   "category": "Friezes",
+   "pixels": [
+    1144,
+    550
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/jungle_backdrop_canopy5@3x.png": {
+   "bytes": 562058,
+   "sha256": "adbacbf23e486911",
+   "category": "Friezes",
+   "pixels": [
+    1716,
+    825
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/jungle_backdrop_fog3@2x.png": {
+   "bytes": 68568,
+   "sha256": "a32640bba02bf210",
+   "category": "Friezes",
+   "pixels": [
+    1129,
+    275
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/jungle_backdrop_fog3@3x.png": {
+   "bytes": 141587,
+   "sha256": "ce2fc0f06cde1ecd",
+   "category": "Friezes",
+   "pixels": [
+    1694,
+    412
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/jungle_backdrop_glow0@2x.png": {
+   "bytes": 228892,
+   "sha256": "75bfce0278427166",
+   "category": "Friezes",
+   "pixels": [
+    1601,
+    585
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/jungle_backdrop_glow0@3x.png": {
+   "bytes": 393537,
+   "sha256": "3cb7227da2649924",
+   "category": "Friezes",
+   "pixels": [
+    2401,
+    878
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/jungle_backdrop_ridge1@2x.png": {
+   "bytes": 191648,
+   "sha256": "9e36d7dad0759d87",
+   "category": "Friezes",
+   "pixels": [
+    1003,
+    600
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/jungle_backdrop_ridge1@3x.png": {
+   "bytes": 318346,
+   "sha256": "384ca00581fe4034",
+   "category": "Friezes",
+   "pixels": [
+    1505,
+    900
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/jungle_backdrop_trunks4@2x.png": {
+   "bytes": 346318,
+   "sha256": "109f986c66921f4f",
+   "category": "Friezes",
+   "pixels": [
+    1397,
+    1003
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/jungle_backdrop_trunks4@3x.png": {
+   "bytes": 614273,
+   "sha256": "d0f1cd822fd541ae",
+   "category": "Friezes",
+   "pixels": [
+    2095,
+    1505
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/jungle_backdrop_vines6@2x.png": {
+   "bytes": 240570,
+   "sha256": "c1cbb74462589b54",
+   "category": "Friezes",
+   "pixels": [
+    581,
+    450
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/jungle_backdrop_vines6@3x.png": {
+   "bytes": 423838,
+   "sha256": "2450ab4d15b14315",
+   "category": "Friezes",
+   "pixels": [
+    872,
+    675
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_cave_crystal@2x.png": {
+   "bytes": 26179,
+   "sha256": "417ab502814e1742",
+   "category": "Friezes",
+   "pixels": [
+    184,
+    312
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_cave_crystal@3x.png": {
+   "bytes": 29987,
+   "sha256": "79a7f8a9663e662c",
+   "category": "Friezes",
+   "pixels": [
+    276,
+    468
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_cave_mushroom@2x.png": {
+   "bytes": 18595,
+   "sha256": "28dcb8da9ff369ab",
+   "category": "Friezes",
+   "pixels": [
+    160,
+    168
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_cave_mushroom@3x.png": {
+   "bytes": 20752,
+   "sha256": "c9ad1ff41877ba73",
+   "category": "Friezes",
+   "pixels": [
+    240,
+    252
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_cave_rock@2x.png": {
+   "bytes": 16100,
+   "sha256": "1415fd022df9b9e5",
+   "category": "Friezes",
+   "pixels": [
+    224,
+    160
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_cave_rock@3x.png": {
+   "bytes": 14582,
+   "sha256": "1a28ae4568295f17",
+   "category": "Friezes",
+   "pixels": [
+    336,
+    240
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_forest_bush@2x.png": {
+   "bytes": 26442,
+   "sha256": "839303724ace45b5",
+   "category": "Friezes",
+   "pixels": [
+    208,
+    152
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_forest_bush@3x.png": {
+   "bytes": 29183,
+   "sha256": "42272a270e545ecf",
+   "category": "Friezes",
+   "pixels": [
+    312,
+    228
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_forest_fern@2x.png": {
+   "bytes": 32083,
+   "sha256": "eab1b5e563d2e84a",
+   "category": "Friezes",
+   "pixels": [
+    176,
+    184
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_forest_fern@3x.png": {
+   "bytes": 34644,
+   "sha256": "8624317cca223b75",
+   "category": "Friezes",
+   "pixels": [
+    264,
+    276
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_forest_rock@2x.png": {
+   "bytes": 14675,
+   "sha256": "9be87a2632e8890e",
+   "category": "Friezes",
+   "pixels": [
+    184,
+    136
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_forest_rock@3x.png": {
+   "bytes": 14216,
+   "sha256": "aa702918c10ab5ce",
+   "category": "Friezes",
+   "pixels": [
+    276,
+    204
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_forest_trunk@2x.png": {
+   "bytes": 49589,
+   "sha256": "8dbe4b266882812a",
+   "category": "Friezes",
+   "pixels": [
+    136,
+    760
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_forest_trunk@3x.png": {
+   "bytes": 39976,
+   "sha256": "1877265d43d12187",
+   "category": "Friezes",
+   "pixels": [
+    204,
+    1140
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_jungle_fern@2x.png": {
+   "bytes": 39708,
+   "sha256": "e77ed73349174873",
+   "category": "Friezes",
+   "pixels": [
+    208,
+    216
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_jungle_fern@3x.png": {
+   "bytes": 44148,
+   "sha256": "b7662ef71a8ffeb3",
+   "category": "Friezes",
+   "pixels": [
+    312,
+    324
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_jungle_mushroom@2x.png": {
+   "bytes": 13630,
+   "sha256": "4adb3d5bf8bda477",
+   "category": "Friezes",
+   "pixels": [
+    152,
+    160
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_jungle_mushroom@3x.png": {
+   "bytes": 14286,
+   "sha256": "b28d98a7934a6af6",
+   "category": "Friezes",
+   "pixels": [
+    228,
+    240
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_jungle_palm@2x.png": {
+   "bytes": 55466,
+   "sha256": "cb1aa29bdc33cbc6",
+   "category": "Friezes",
+   "pixels": [
+    312,
+    600
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_jungle_palm@3x.png": {
+   "bytes": 46436,
+   "sha256": "15a73128c9564e5c",
+   "category": "Friezes",
+   "pixels": [
+    468,
+    900
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_jungle_trunk@2x.png": {
+   "bytes": 60786,
+   "sha256": "f364651262de7d3f",
+   "category": "Friezes",
+   "pixels": [
+    160,
+    840
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_jungle_trunk@3x.png": {
+   "bytes": 44804,
+   "sha256": "4677d062f149a015",
+   "category": "Friezes",
+   "pixels": [
+    240,
+    1260
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_ridge_bush@2x.png": {
+   "bytes": 24739,
+   "sha256": "168cb49a0a84a784",
+   "category": "Friezes",
+   "pixels": [
+    184,
+    128
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_ridge_bush@3x.png": {
+   "bytes": 28724,
+   "sha256": "3c18728a05afce26",
+   "category": "Friezes",
+   "pixels": [
+    276,
+    192
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_ridge_crystal@2x.png": {
+   "bytes": 23513,
+   "sha256": "ea2161128f14e635",
+   "category": "Friezes",
+   "pixels": [
+    176,
+    264
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_ridge_crystal@3x.png": {
+   "bytes": 28025,
+   "sha256": "75a6306ed0727d90",
+   "category": "Friezes",
+   "pixels": [
+    264,
+    396
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_ridge_rock@2x.png": {
+   "bytes": 21176,
+   "sha256": "90528e5f3f225183",
+   "category": "Friezes",
+   "pixels": [
+    232,
+    168
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_ridge_rock@3x.png": {
+   "bytes": 21926,
+   "sha256": "eaa9ec8c94069501",
+   "category": "Friezes",
+   "pixels": [
+    348,
+    252
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_ridge_trunk@2x.png": {
+   "bytes": 45393,
+   "sha256": "cba563a707dbe541",
+   "category": "Friezes",
+   "pixels": [
+    120,
+    600
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_ridge_trunk@3x.png": {
+   "bytes": 41635,
+   "sha256": "3acff009cd075924",
+   "category": "Friezes",
+   "pixels": [
+    180,
+    900
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_shore_bush@2x.png": {
+   "bytes": 29710,
+   "sha256": "466603fdbe85875c",
+   "category": "Friezes",
+   "pixels": [
+    200,
+    144
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_shore_bush@3x.png": {
+   "bytes": 36347,
+   "sha256": "9484485c033ebe75",
+   "category": "Friezes",
+   "pixels": [
+    300,
+    216
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_shore_palm@2x.png": {
+   "bytes": 70169,
+   "sha256": "ab4fd669170c9edd",
+   "category": "Friezes",
+   "pixels": [
+    344,
+    672
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_shore_palm@3x.png": {
+   "bytes": 64772,
+   "sha256": "72ef80d79513a1de",
+   "category": "Friezes",
+   "pixels": [
+    516,
+    1008
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_shore_rock@2x.png": {
+   "bytes": 18974,
+   "sha256": "acaf39cc3d47d1b4",
+   "category": "Friezes",
+   "pixels": [
+    216,
+    152
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_shore_rock@3x.png": {
+   "bytes": 19653,
+   "sha256": "1edfc38879222a7f",
+   "category": "Friezes",
+   "pixels": [
+    324,
+    228
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_sky_bush@2x.png": {
+   "bytes": 29372,
+   "sha256": "1dd557f36abfe729",
+   "category": "Friezes",
+   "pixels": [
+    192,
+    136
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_sky_bush@3x.png": {
+   "bytes": 36715,
+   "sha256": "cdf7a4766d5eb781",
+   "category": "Friezes",
+   "pixels": [
+    288,
+    204
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_sky_cloud@2x.png": {
+   "bytes": 136658,
+   "sha256": "d3efc6b03d35dee5",
+   "category": "Friezes",
+   "pixels": [
+    560,
+    280
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_sky_cloud@3x.png": {
+   "bytes": 242559,
+   "sha256": "f2ce31c6077ad007",
+   "category": "Friezes",
+   "pixels": [
+    840,
+    420
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/prop_sky_rock@2x.png": {
+   "bytes": 19635,
+   "sha256": "d5621123c48ff6bf",
+   "category": "Friezes",
+   "pixels": [
+    216,
+    152
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/prop_sky_rock@3x.png": {
+   "bytes": 21537,
+   "sha256": "4e0d191d12e26632",
+   "category": "Friezes",
+   "pixels": [
+    324,
+    228
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/ridge_backdrop.json": {
+   "bytes": 2676,
+   "sha256": "7a2fbbbf0b2bd4ec",
+   "category": "Friezes"
+  },
+  "Assets/Friezes/ridge_backdrop_canopy2@2x.png": {
+   "bytes": 210526,
+   "sha256": "ece49a7781ac00a9",
+   "category": "Friezes",
+   "pixels": [
+    687,
+    375
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/ridge_backdrop_canopy2@3x.png": {
+   "bytes": 372100,
+   "sha256": "dcf8ccf2281f65d2",
+   "category": "Friezes",
+   "pixels": [
+    1030,
+    562
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/ridge_backdrop_canopy5@2x.png": {
+   "bytes": 341722,
+   "sha256": "2b3e7beae77c522a",
+   "category": "Friezes",
+   "pixels": [
+    1144,
+    550
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/ridge_backdrop_canopy5@3x.png": {
+   "bytes": 596830,
+   "sha256": "1dd6d26c5778c29e",
+   "category": "Friezes",
+   "pixels": [
+    1716,
+    825
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/ridge_backdrop_fog3@2x.png": {
+   "bytes": 44508,
+   "sha256": "665baa71a076e19f",
+   "category": "Friezes",
+   "pixels": [
+    1129,
+    275
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/ridge_backdrop_fog3@3x.png": {
+   "bytes": 100965,
+   "sha256": "2d01e2b284a0f0b1",
+   "category": "Friezes",
+   "pixels": [
+    1694,
+    412
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/ridge_backdrop_glow0@2x.png": {
+   "bytes": 236918,
+   "sha256": "aff929d4b4f9f2c7",
+   "category": "Friezes",
+   "pixels": [
+    1591,
+    585
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/ridge_backdrop_glow0@3x.png": {
+   "bytes": 392303,
+   "sha256": "6776ed7b17d5f0ca",
+   "category": "Friezes",
+   "pixels": [
+    2386,
+    878
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/ridge_backdrop_ridge1@2x.png": {
+   "bytes": 218853,
+   "sha256": "53e7e609f4eeb045",
+   "category": "Friezes",
+   "pixels": [
+    1003,
+    600
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/ridge_backdrop_ridge1@3x.png": {
+   "bytes": 371940,
+   "sha256": "107a79f4db3deb22",
+   "category": "Friezes",
+   "pixels": [
+    1505,
+    900
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/ridge_backdrop_trunks4@2x.png": {
+   "bytes": 299434,
+   "sha256": "2450be5169c9ea7c",
+   "category": "Friezes",
+   "pixels": [
+    1297,
+    932
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/ridge_backdrop_trunks4@3x.png": {
+   "bytes": 535365,
+   "sha256": "224ca4f4e38e963a",
+   "category": "Friezes",
+   "pixels": [
+    1945,
+    1398
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/ridge_backdrop_vines6@2x.png": {
+   "bytes": 220350,
+   "sha256": "3268c210cf427ec0",
+   "category": "Friezes",
+   "pixels": [
+    581,
+    450
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/ridge_backdrop_vines6@3x.png": {
+   "bytes": 392803,
+   "sha256": "a0d6bb1760ea44ec",
+   "category": "Friezes",
+   "pixels": [
+    872,
+    675
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/shore_backdrop.json": {
+   "bytes": 2380,
+   "sha256": "e4e22607b30140b9",
+   "category": "Friezes"
+  },
+  "Assets/Friezes/shore_backdrop_canopy2@2x.png": {
+   "bytes": 214585,
+   "sha256": "3aa4699f33c4df4a",
+   "category": "Friezes",
+   "pixels": [
+    687,
+    375
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/shore_backdrop_canopy2@3x.png": {
+   "bytes": 380908,
+   "sha256": "ed292a736ef5c397",
+   "category": "Friezes",
+   "pixels": [
+    1030,
+    562
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/shore_backdrop_canopy5@2x.png": {
+   "bytes": 362670,
+   "sha256": "46137cfeadf5bbac",
+   "category": "Friezes",
+   "pixels": [
+    1144,
+    550
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/shore_backdrop_canopy5@3x.png": {
+   "bytes": 633016,
+   "sha256": "6cecd02ddb1507c2",
+   "category": "Friezes",
+   "pixels": [
+    1716,
+    825
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/shore_backdrop_fog3@2x.png": {
+   "bytes": 44508,
+   "sha256": "665baa71a076e19f",
+   "category": "Friezes",
+   "pixels": [
+    1129,
+    275
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/shore_backdrop_fog3@3x.png": {
+   "bytes": 100965,
+   "sha256": "2d01e2b284a0f0b1",
+   "category": "Friezes",
+   "pixels": [
+    1694,
+    412
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/shore_backdrop_glow0@2x.png": {
+   "bytes": 231118,
+   "sha256": "094e3164eb78ba55",
+   "category": "Friezes",
+   "pixels": [
+    1591,
+    585
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/shore_backdrop_glow0@3x.png": {
+   "bytes": 386817,
+   "sha256": "60eca0a5cf325324",
+   "category": "Friezes",
+   "pixels": [
+    2386,
+    878
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/shore_backdrop_ridge1@2x.png": {
+   "bytes": 218411,
+   "sha256": "54e86628d8c3d3be",
+   "category": "Friezes",
+   "pixels": [
+    1003,
+    600
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/shore_backdrop_ridge1@3x.png": {
+   "bytes": 375540,
+   "sha256": "01aa7e939445197b",
+   "category": "Friezes",
+   "pixels": [
+    1505,
+    900
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/shore_backdrop_trunks4@2x.png": {
+   "bytes": 310541,
+   "sha256": "be43fc0d9565bea8",
+   "category": "Friezes",
+   "pixels": [
+    1297,
+    932
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/shore_backdrop_trunks4@3x.png": {
+   "bytes": 552592,
+   "sha256": "be429a50314729af",
+   "category": "Friezes",
+   "pixels": [
+    1945,
+    1398
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/shore_backdrop_vines6@2x.png": {
+   "bytes": 226327,
+   "sha256": "4c7cbaba45478877",
+   "category": "Friezes",
+   "pixels": [
+    581,
+    450
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/shore_backdrop_vines6@3x.png": {
+   "bytes": 400086,
+   "sha256": "5b467c2502207636",
+   "category": "Friezes",
+   "pixels": [
+    872,
+    675
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/sky_backdrop.json": {
+   "bytes": 2582,
+   "sha256": "5b674b0ebbfb242c",
+   "category": "Friezes"
+  },
+  "Assets/Friezes/sky_backdrop_canopy2@2x.png": {
+   "bytes": 294562,
+   "sha256": "2d330c8704a395c3",
+   "category": "Friezes",
+   "pixels": [
+    839,
+    459
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/sky_backdrop_canopy2@3x.png": {
+   "bytes": 519644,
+   "sha256": "6ec56cc925a29ba7",
+   "category": "Friezes",
+   "pixels": [
+    1259,
+    688
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/sky_backdrop_canopy5@2x.png": {
+   "bytes": 287212,
+   "sha256": "7d18dffd82247e14",
+   "category": "Friezes",
+   "pixels": [
+    915,
+    440
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/sky_backdrop_canopy5@3x.png": {
+   "bytes": 522668,
+   "sha256": "4d65f3ae5d342ef6",
+   "category": "Friezes",
+   "pixels": [
+    1373,
+    660
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/sky_backdrop_fog3@2x.png": {
+   "bytes": 55915,
+   "sha256": "dbdc066e620e957f",
+   "category": "Friezes",
+   "pixels": [
+    1335,
+    325
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/sky_backdrop_fog3@3x.png": {
+   "bytes": 126352,
+   "sha256": "8e1c83c96258de04",
+   "category": "Friezes",
+   "pixels": [
+    2002,
+    488
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/sky_backdrop_glow0@2x.png": {
+   "bytes": 235376,
+   "sha256": "23c81d2ac8df1c6c",
+   "category": "Friezes",
+   "pixels": [
+    1649,
+    585
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/sky_backdrop_glow0@3x.png": {
+   "bytes": 399493,
+   "sha256": "31b9c6e9651c3f0e",
+   "category": "Friezes",
+   "pixels": [
+    2473,
+    878
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/sky_backdrop_ridge1@2x.png": {
+   "bytes": 220936,
+   "sha256": "235bd5866643a6a1",
+   "category": "Friezes",
+   "pixels": [
+    1003,
+    600
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/sky_backdrop_ridge1@3x.png": {
+   "bytes": 382687,
+   "sha256": "23c1216cca06ef51",
+   "category": "Friezes",
+   "pixels": [
+    1505,
+    900
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/sky_backdrop_trunks4@2x.png": {
+   "bytes": 389566,
+   "sha256": "b8fd31f61a8df8d5",
+   "category": "Friezes",
+   "pixels": [
+    1496,
+    1075
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/sky_backdrop_trunks4@3x.png": {
+   "bytes": 710031,
+   "sha256": "66627ed760537e74",
+   "category": "Friezes",
+   "pixels": [
+    2244,
+    1612
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Friezes/sky_backdrop_vines6@2x.png": {
+   "bytes": 211824,
+   "sha256": "19125a5fe90da5d0",
+   "category": "Friezes",
+   "pixels": [
+    581,
+    450
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Friezes/sky_backdrop_vines6@3x.png": {
+   "bytes": 382370,
+   "sha256": "2f4b0d364e5637ac",
+   "category": "Friezes",
+   "pixels": [
+    872,
+    675
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Levels/arena.json": {
+   "bytes": 512,
+   "sha256": "0b522218cc2911e9",
+   "category": "Levels"
+  },
+  "Assets/Levels/bluffs.json": {
+   "bytes": 1158,
+   "sha256": "201b3d8ffd11550b",
+   "category": "Levels"
+  },
+  "Assets/Levels/grove.json": {
+   "bytes": 658,
+   "sha256": "b3f93791ce9bd3ed",
+   "category": "Levels"
+  },
+  "Assets/Levels/hollow.json": {
+   "bytes": 680,
+   "sha256": "780d967b30480fc8",
+   "category": "Levels"
+  },
+  "Assets/Levels/ridge.json": {
+   "bytes": 694,
+   "sha256": "21ef10e225d53fc7",
+   "category": "Levels"
+  },
+  "Assets/Rigs/hero_atlas.json": {
+   "bytes": 1783,
+   "sha256": "fda5d600b93bab2f",
+   "category": "Rigs"
+  },
+  "Assets/Rigs/hero_atlas.png": {
+   "bytes": 91543,
+   "sha256": "958851b5aa7aa243",
+   "category": "Rigs",
+   "pixels": [
+    164,
+    644
+   ],
+   "suffixScale": 1
+  },
+  "Assets/Rigs/hero_body@2x.png": {
+   "bytes": 16556,
+   "sha256": "260c7a8f80b2da4e",
+   "category": "Rigs",
+   "pixels": [
+    104,
+    120
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Rigs/hero_body@3x.png": {
+   "bytes": 33592,
+   "sha256": "553710033f309c76",
+   "category": "Rigs",
+   "pixels": [
+    156,
+    180
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Rigs/hero_foot_l@2x.png": {
+   "bytes": 2967,
+   "sha256": "fd30863daa4a4804",
+   "category": "Rigs",
+   "pixels": [
+    60,
+    36
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Rigs/hero_foot_l@3x.png": {
+   "bytes": 5632,
+   "sha256": "a2893e49f757e2f1",
+   "category": "Rigs",
+   "pixels": [
+    90,
+    54
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Rigs/hero_foot_r@2x.png": {
+   "bytes": 2980,
+   "sha256": "ce700cb0ce1b7d48",
+   "category": "Rigs",
+   "pixels": [
+    60,
+    36
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Rigs/hero_foot_r@3x.png": {
+   "bytes": 5625,
+   "sha256": "3fdaaad3ef3c3cf9",
+   "category": "Rigs",
+   "pixels": [
+    90,
+    54
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Rigs/hero_hand_l@2x.png": {
+   "bytes": 2925,
+   "sha256": "a95269df68ce092d",
+   "category": "Rigs",
+   "pixels": [
+    44,
+    44
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Rigs/hero_hand_l@3x.png": {
+   "bytes": 5245,
+   "sha256": "b404371a3f18b5fd",
+   "category": "Rigs",
+   "pixels": [
+    66,
+    66
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Rigs/hero_hand_r@2x.png": {
+   "bytes": 2910,
+   "sha256": "afd7f101670aec7c",
+   "category": "Rigs",
+   "pixels": [
+    44,
+    44
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Rigs/hero_hand_r@3x.png": {
+   "bytes": 5296,
+   "sha256": "c50e54011126ab51",
+   "category": "Rigs",
+   "pixels": [
+    66,
+    66
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Rigs/hero_head@2x.png": {
+   "bytes": 14662,
+   "sha256": "38ab7798cf87bc29",
+   "category": "Rigs",
+   "pixels": [
+    96,
+    96
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Rigs/hero_head@3x.png": {
+   "bytes": 28146,
+   "sha256": "e307dc44fe46f5c7",
+   "category": "Rigs",
+   "pixels": [
+    144,
+    144
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Rigs/hero_rig.json": {
+   "bytes": 37050,
+   "sha256": "455067f7eaa3d40a",
+   "category": "Rigs"
+  },
+  "Assets/Rigs/hero_tuft@2x.png": {
+   "bytes": 3879,
+   "sha256": "c5f55a1decb70b69",
+   "category": "Rigs",
+   "pixels": [
+    56,
+    72
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Rigs/hero_tuft@3x.png": {
+   "bytes": 6999,
+   "sha256": "5068215a06b0da24",
+   "category": "Rigs",
+   "pixels": [
+    84,
+    108
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Terrain/tex_cave_basalt@2x.png": {
+   "bytes": 71053,
+   "sha256": "6b86dfb7a096e748",
+   "category": "Terrain",
+   "pixels": [
+    384,
+    384
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Terrain/tex_cave_basalt@3x.png": {
+   "bytes": 97503,
+   "sha256": "d89aea770ff11c20",
+   "category": "Terrain",
+   "pixels": [
+    576,
+    576
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Terrain/tex_cave_cliff@2x.png": {
+   "bytes": 97851,
+   "sha256": "1456b710d2113918",
+   "category": "Terrain",
+   "pixels": [
+    384,
+    384
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Terrain/tex_cave_cliff@3x.png": {
+   "bytes": 136386,
+   "sha256": "14e6b07adaa268e0",
+   "category": "Terrain",
+   "pixels": [
+    576,
+    576
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Terrain/tex_cave_moss@2x.png": {
+   "bytes": 95503,
+   "sha256": "803596094f7fa1c6",
+   "category": "Terrain",
+   "pixels": [
+    384,
+    384
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Terrain/tex_cave_moss@3x.png": {
+   "bytes": 130064,
+   "sha256": "3605b9b5ee9e8f8a",
+   "category": "Terrain",
+   "pixels": [
+    576,
+    576
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Terrain/tex_forest_cliff@2x.png": {
+   "bytes": 99120,
+   "sha256": "8a9164d08e158317",
+   "category": "Terrain",
+   "pixels": [
+    384,
+    384
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Terrain/tex_forest_cliff@3x.png": {
+   "bytes": 145637,
+   "sha256": "05d98f7c7728e1f8",
+   "category": "Terrain",
+   "pixels": [
+    576,
+    576
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Terrain/tex_forest_grass@2x.png": {
+   "bytes": 108211,
+   "sha256": "8b9a137f4297db3c",
+   "category": "Terrain",
+   "pixels": [
+    384,
+    384
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Terrain/tex_forest_grass@3x.png": {
+   "bytes": 159612,
+   "sha256": "ad3bc1679358e6a1",
+   "category": "Terrain",
+   "pixels": [
+    576,
+    576
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Terrain/tex_forest_soil@2x.png": {
+   "bytes": 88616,
+   "sha256": "8977288005aa2185",
+   "category": "Terrain",
+   "pixels": [
+    384,
+    384
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Terrain/tex_forest_soil@3x.png": {
+   "bytes": 123252,
+   "sha256": "ee502036d7de6020",
+   "category": "Terrain",
+   "pixels": [
+    576,
+    576
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Terrain/tex_jungle_cliff@2x.png": {
+   "bytes": 91782,
+   "sha256": "d0cdb4bc9665888d",
+   "category": "Terrain",
+   "pixels": [
+    384,
+    384
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Terrain/tex_jungle_cliff@3x.png": {
+   "bytes": 133411,
+   "sha256": "5571d10e5d5f5a77",
+   "category": "Terrain",
+   "pixels": [
+    576,
+    576
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Terrain/tex_jungle_moss@2x.png": {
+   "bytes": 109685,
+   "sha256": "6dbb0a1e652aefb2",
+   "category": "Terrain",
+   "pixels": [
+    384,
+    384
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Terrain/tex_jungle_moss@3x.png": {
+   "bytes": 141951,
+   "sha256": "38f5fcbad8c6f0e1",
+   "category": "Terrain",
+   "pixels": [
+    576,
+    576
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Terrain/tex_jungle_soil@2x.png": {
+   "bytes": 78517,
+   "sha256": "6e9207d6573be702",
+   "category": "Terrain",
+   "pixels": [
+    384,
+    384
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Terrain/tex_jungle_soil@3x.png": {
+   "bytes": 107412,
+   "sha256": "9d6987fd386899d2",
+   "category": "Terrain",
+   "pixels": [
+    576,
+    576
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Terrain/tex_ridge_cliff@2x.png": {
+   "bytes": 124805,
+   "sha256": "5201e2860dd8c3cc",
+   "category": "Terrain",
+   "pixels": [
+    384,
+    384
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Terrain/tex_ridge_cliff@3x.png": {
+   "bytes": 199441,
+   "sha256": "e2e8a2a5c47d8e2d",
+   "category": "Terrain",
+   "pixels": [
+    576,
+    576
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Terrain/tex_ridge_ice@2x.png": {
+   "bytes": 138917,
+   "sha256": "b34f9cd0fa903ce9",
+   "category": "Terrain",
+   "pixels": [
+    384,
+    384
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Terrain/tex_ridge_ice@3x.png": {
+   "bytes": 233958,
+   "sha256": "fdf9b76911540df0",
+   "category": "Terrain",
+   "pixels": [
+    576,
+    576
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Terrain/tex_ridge_soil@2x.png": {
+   "bytes": 89054,
+   "sha256": "77c378460a580fd5",
+   "category": "Terrain",
+   "pixels": [
+    384,
+    384
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Terrain/tex_ridge_soil@3x.png": {
+   "bytes": 132811,
+   "sha256": "c240e40546861224",
+   "category": "Terrain",
+   "pixels": [
+    576,
+    576
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Terrain/tex_shore_cliff@2x.png": {
+   "bytes": 124977,
+   "sha256": "d0099247486cd647",
+   "category": "Terrain",
+   "pixels": [
+    384,
+    384
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Terrain/tex_shore_cliff@3x.png": {
+   "bytes": 199998,
+   "sha256": "9ebb748b0da61b22",
+   "category": "Terrain",
+   "pixels": [
+    576,
+    576
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Terrain/tex_shore_grass@2x.png": {
+   "bytes": 122990,
+   "sha256": "5d862db6ae22b380",
+   "category": "Terrain",
+   "pixels": [
+    384,
+    384
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Terrain/tex_shore_grass@3x.png": {
+   "bytes": 194204,
+   "sha256": "ef2aedbe798f1373",
+   "category": "Terrain",
+   "pixels": [
+    576,
+    576
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Terrain/tex_shore_sand@2x.png": {
+   "bytes": 129494,
+   "sha256": "ef01eb410ccee2af",
+   "category": "Terrain",
+   "pixels": [
+    384,
+    384
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Terrain/tex_shore_sand@3x.png": {
+   "bytes": 216405,
+   "sha256": "e01a55d1c9715862",
+   "category": "Terrain",
+   "pixels": [
+    576,
+    576
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Terrain/tex_sky_cliff@2x.png": {
+   "bytes": 132196,
+   "sha256": "782c97e59b1a81bc",
+   "category": "Terrain",
+   "pixels": [
+    384,
+    384
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Terrain/tex_sky_cliff@3x.png": {
+   "bytes": 217989,
+   "sha256": "0d3e986f041afeae",
+   "category": "Terrain",
+   "pixels": [
+    576,
+    576
+   ],
+   "suffixScale": 3
+  },
+  "Assets/Terrain/tex_sky_grass@2x.png": {
+   "bytes": 127620,
+   "sha256": "b399248c89dd1bdb",
+   "category": "Terrain",
+   "pixels": [
+    384,
+    384
+   ],
+   "suffixScale": 2
+  },
+  "Assets/Terrain/tex_sky_grass@3x.png": {
+   "bytes": 205395,
+   "sha256": "71b1fbc233ffefa6",
+   "category": "Terrain",
+   "pixels": [
+    576,
+    576
+   ],
+   "suffixScale": 3
+  }
+ }
+}

@@ -1,0 +1,185 @@
+{
+ "format": "level/1",
+ "name": "gauntlet",
+ "order": 45,
+ "title": "The Gauntlet",
+ "frieze": "jungle_backdrop",
+ "timeOfDay": 0.55,
+ "music": "theme_hollow",
+ "grade": "hollow",
+ "camera": {
+  "zoom": 1.0,
+  "lead": 0.16,
+  "zones": [
+   {
+    "col": 19,
+    "width": 8,
+    "zoom": 1.28,
+    "blend": 0.6
+   },
+   {
+    "col": 31,
+    "width": 15,
+    "mode": "chase",
+    "speed": 210,
+    "blend": 0.4
+   }
+  ]
+ },
+ "triggers": [
+  {
+   "name": "intro",
+   "when": "start",
+   "actions": [
+    {
+     "do": "text",
+     "message": "Clear the room",
+     "seconds": 2.0
+    }
+   ]
+  },
+  {
+   "name": "ambush",
+   "region": {
+    "col": 19,
+    "width": 2
+   },
+   "when": "enter",
+   "actions": [
+    {
+     "do": "spawn",
+     "kind": "enemy",
+     "col": 21,
+     "row": 7,
+     "count": 3,
+     "spacing": 2
+    },
+    {
+     "do": "sound",
+     "name": "boss_hit"
+    },
+    {
+     "do": "shake",
+     "strength": 0.6
+    },
+    {
+     "do": "camera",
+     "mode": "lockY",
+     "zoom": 1.28
+    }
+   ]
+  },
+  {
+   "name": "open_gate",
+   "region": {
+    "col": 19,
+    "width": 7
+   },
+   "when": "inside",
+   "once": false,
+   "requires": {
+    "enemiesDefeated": 3,
+    "afterTrigger": "ambush"
+   },
+   "actions": [
+    {
+     "do": "move",
+     "target": "gate",
+     "dx": 0,
+     "dy": 200,
+     "seconds": 1.2
+    },
+    {
+     "do": "sound",
+     "name": "checkpoint"
+    },
+    {
+     "do": "camera",
+     "mode": "follow",
+     "zoom": 1.0
+    }
+   ]
+  },
+  {
+   "name": "start_chase",
+   "region": {
+    "col": 31,
+    "width": 2
+   },
+   "when": "enter",
+   "requires": {
+    "afterTrigger": "open_gate"
+   },
+   "actions": [
+    {
+     "do": "music",
+     "name": "theme_arena"
+    },
+    {
+     "do": "grade",
+     "name": "arena"
+    },
+    {
+     "do": "hazardWall",
+     "fromCol": 27,
+     "speed": 205
+    },
+    {
+     "do": "tuning",
+     "runSpeed": 320
+    },
+    {
+     "do": "text",
+     "message": "RUN!",
+     "seconds": 1.4
+    },
+    {
+     "do": "shake",
+     "strength": 0.9
+    }
+   ]
+  }
+ ],
+ "rows": [
+  "..............................................",
+  "..............................................",
+  "..............................................",
+  "..............................................",
+  "..............................................",
+  "..............................................",
+  "..............................................",
+  "..S.....C...C...C.............@...C...C....F..",
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+ ],
+ "frises": [
+  {
+   "name": "gate",
+   "kind": "ground",
+   "texture": "tex_jungle_cliff",
+   "cap": "tex_jungle_moss",
+   "color": [
+    70,
+    96,
+    62
+   ],
+   "thickness": 40,
+   "capHeight": 10,
+   "points": [
+    [
+     1040,
+     200
+    ],
+    [
+     1040,
+     120
+    ],
+    [
+     1040,
+     40
+    ]
+   ],
+   "resolution": 6
+  }
+ ],
+ "enemyBehaviour": "behaviour_charger"
+}

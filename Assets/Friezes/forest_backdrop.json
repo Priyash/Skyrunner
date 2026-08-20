@@ -1,0 +1,208 @@
+{
+ "focus": 0.62,
+ "haze": 0.38,
+ "dofPointsPerDepth": 5.0,
+ "sky": [
+  [
+   120,
+   150,
+   96
+  ],
+  [
+   250,
+   226,
+   152
+  ],
+  [
+   186,
+   200,
+   120
+  ],
+  [
+   92,
+   132,
+   84
+  ],
+  [
+   34,
+   60,
+   50
+  ]
+ ],
+ "layers": [
+  {
+   "image": "forest_backdrop_glow0",
+   "x": 0.0,
+   "y": -10.0,
+   "depth": 0.05,
+   "tile": false,
+   "density": 2.25
+  },
+  {
+   "image": "forest_backdrop_ridge1",
+   "x": 0.0,
+   "y": -168.0,
+   "depth": 0.18,
+   "tile": true,
+   "density": 2.25
+  },
+  {
+   "image": "forest_backdrop_canopy2",
+   "x": 0.0,
+   "y": 152.0,
+   "depth": 0.3,
+   "tile": true,
+   "density": 2.25,
+   "wind": 14,
+   "windPinTop": true
+  },
+  {
+   "image": "forest_backdrop_fog3",
+   "x": 0.0,
+   "y": -120.0,
+   "depth": 0.4,
+   "tile": true,
+   "density": 2.5
+  },
+  {
+   "image": "forest_backdrop_trunks4",
+   "x": 0.0,
+   "y": 0.0,
+   "depth": 0.52,
+   "tile": true,
+   "density": 3.25,
+   "props": [
+    {
+     "image": "prop_forest_trunk",
+     "count": 7,
+     "span": 680,
+     "y": -60,
+     "yJitter": 26,
+     "scale": 1.0,
+     "scaleJitter": 0.28,
+     "flipChance": 0.5,
+     "seed": 4177,
+     "density": 6.0
+    },
+    {
+     "image": "prop_forest_rock",
+     "count": 6,
+     "span": 680,
+     "y": -132,
+     "yJitter": 10,
+     "scale": 0.9,
+     "scaleJitter": 0.34,
+     "flipChance": 0.5,
+     "seed": 8021,
+     "density": 6.0
+    }
+   ],
+   "frises": [
+    {
+     "points": [
+      [
+       -80,
+       60
+      ],
+      [
+       200,
+       118
+      ],
+      [
+       430,
+       76
+      ],
+      [
+       660,
+       126
+      ],
+      [
+       860,
+       70
+      ]
+     ],
+     "thickness": 110,
+     "capHeight": 0,
+     "color": [
+      132,
+      164,
+      100
+     ]
+    }
+   ],
+   "wind": 5
+  },
+  {
+   "image": "forest_backdrop_canopy5",
+   "x": 0.0,
+   "y": 170.0,
+   "depth": 0.62,
+   "tile": true,
+   "density": 4.0,
+   "props": [
+    {
+     "image": "prop_forest_fern",
+     "count": 9,
+     "span": 460,
+     "y": -80,
+     "yJitter": 18,
+     "scale": 1.1,
+     "scaleJitter": 0.3,
+     "flipChance": 0.5,
+     "seed": 991,
+     "density": 6.0
+    },
+    {
+     "image": "prop_forest_bush",
+     "count": 7,
+     "span": 460,
+     "y": -120,
+     "yJitter": 18,
+     "scale": 1.0,
+     "scaleJitter": 0.3,
+     "flipChance": 0.5,
+     "seed": 3307,
+     "density": 6.0
+    }
+   ],
+   "wind": 14,
+   "windPinTop": true
+  },
+  {
+   "image": "forest_backdrop_vines6",
+   "x": 0.0,
+   "y": 115.0,
+   "depth": 0.88,
+   "tile": true,
+   "density": 2.5,
+   "wind": 26,
+   "windPinTop": true
+  }
+ ],
+ "vignette": 0.3,
+ "rays": {
+  "x": -120,
+  "y": 210,
+  "angles": [
+   -16,
+   -8,
+   4,
+   12
+  ],
+  "color": [
+   255,
+   234,
+   162
+  ],
+  "alpha": 0.16,
+  "width": 46
+ },
+ "fireflies": {
+  "count": 26,
+  "color": [
+   255,
+   234,
+   162
+  ]
+ }
+}

@@ -1,0 +1,189 @@
+{
+ "format": "frieze-spec/1",
+ "name": "shore_backdrop",
+ "sky": [
+  [
+   252,
+   232,
+   196
+  ],
+  [
+   255,
+   246,
+   222
+  ],
+  [
+   214,
+   234,
+   246
+  ],
+  [
+   148,
+   200,
+   232
+  ],
+  [
+   86,
+   156,
+   204
+  ]
+ ],
+ "palette": {
+  "far": [
+   216,
+   216,
+   186
+  ],
+  "mid": [
+   186,
+   190,
+   150
+  ],
+  "trunk": [
+   138,
+   122,
+   92
+  ],
+  "near": [
+   86,
+   84,
+   62
+  ],
+  "accent": [
+   255,
+   244,
+   200
+  ]
+ },
+ "focus": 0.6,
+ "haze": 0.42,
+ "dofPointsPerDepth": 5,
+ "vignette": 0.3,
+ "texture": 0.26,
+ "rays": true,
+ "fireflies": false,
+ "layers": [
+  {
+   "kind": "glow",
+   "depth": 0.05,
+   "color": "accent",
+   "y": -10,
+   "height": 390
+  },
+  {
+   "kind": "ridge",
+   "depth": 0.18,
+   "color": "far",
+   "y": -168,
+   "height": 400
+  },
+  {
+   "kind": "canopy",
+   "depth": 0.3,
+   "color": "far",
+   "y": 152,
+   "height": 250
+  },
+  {
+   "kind": "fog",
+   "depth": 0.4,
+   "color": "accent",
+   "y": -120,
+   "height": 150
+  },
+  {
+   "kind": "trunks",
+   "depth": 0.52,
+   "color": "trunk",
+   "y": 0,
+   "height": 430,
+   "props": [
+    {
+     "image": "prop_shore_palm",
+     "count": 7,
+     "span": 680,
+     "y": -60,
+     "yJitter": 26,
+     "scale": 1.0,
+     "scaleJitter": 0.28,
+     "flipChance": 0.5,
+     "seed": 4177,
+     "density": 6.0
+    },
+    {
+     "image": "prop_shore_rock",
+     "count": 6,
+     "span": 680,
+     "y": -132,
+     "yJitter": 10,
+     "scale": 0.9,
+     "scaleJitter": 0.34,
+     "flipChance": 0.5,
+     "seed": 8021,
+     "density": 6.0
+    }
+   ],
+   "frises": [
+    {
+     "points": [
+      [
+       -80,
+       60
+      ],
+      [
+       200,
+       118
+      ],
+      [
+       430,
+       76
+      ],
+      [
+       660,
+       126
+      ],
+      [
+       860,
+       70
+      ]
+     ],
+     "thickness": 110,
+     "capHeight": 0,
+     "color": [
+      216,
+      216,
+      186
+     ]
+    }
+   ]
+  },
+  {
+   "kind": "canopy",
+   "depth": 0.62,
+   "color": "mid",
+   "y": 170,
+   "height": 220,
+   "props": [
+    {
+     "image": "prop_shore_bush",
+     "count": 9,
+     "span": 460,
+     "y": -80,
+     "yJitter": 18,
+     "scale": 1.1,
+     "scaleJitter": 0.3,
+     "flipChance": 0.5,
+     "seed": 991,
+     "density": 6.0
+    }
+   ]
+  },
+  {
+   "kind": "vines",
+   "depth": 0.88,
+   "color": "near",
+   "y": 115,
+   "height": 300
+  }
+ ]
+}

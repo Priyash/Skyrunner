@@ -1,0 +1,54 @@
+/Users/priyash/Documents/Apple_Documents/SkyRunner/SkyRunner/Assets/Rigs/hero_atlas.png
+size: 164,644
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+hero_body
+  rotate: false
+  xy: 2, 2
+  size: 156, 180
+  orig: 156, 180
+  offset: 0, 0
+  index: -1
+hero_head
+  rotate: false
+  xy: 2, 186
+  size: 144, 144
+  orig: 144, 144
+  offset: 0, 0
+  index: -1
+hero_tuft
+  rotate: false
+  xy: 2, 334
+  size: 84, 108
+  orig: 84, 108
+  offset: 0, 0
+  index: -1
+hero_hand_l
+  rotate: false
+  xy: 2, 446
+  size: 66, 66
+  orig: 66, 66
+  offset: 0, 0
+  index: -1
+hero_hand_r
+  rotate: false
+  xy: 2, 516
+  size: 66, 66
+  orig: 66, 66
+  offset: 0, 0
+  index: -1
+hero_foot_l
+  rotate: false
+  xy: 2, 586
+  size: 90, 54
+  orig: 90, 54
+  offset: 0, 0
+  index: -1
+hero_foot_r
+  rotate: false
+  xy: 72, 446
+  size: 90, 54
+  orig: 90, 54
+  offset: 0, 0
+  index: -1
