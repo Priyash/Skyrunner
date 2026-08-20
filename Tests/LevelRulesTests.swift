@@ -105,7 +105,8 @@ final class LevelRulesTests: XCTestCase {
         // The strongest single assertion in the suite: whatever the rules say,
         // the game's own content has to satisfy them.
         for (index, rows) in Levels.all.enumerated() {
-            let problems = LevelRules.validate(rows)
+            let footprint = LevelLibrary.file(at: index)?.friseFootprint() ?? []
+            let problems = LevelRules.validate(rows, solidCells: footprint)
             XCTAssertTrue(problems.isEmpty,
                           "shipped level \(index) violates its own rules: "
                           + problems.joined(separator: "; "))

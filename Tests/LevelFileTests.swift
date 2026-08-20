@@ -78,7 +78,8 @@ final class LevelFileTests: XCTestCase {
 
     func testEveryLevelFileObeysTheDesignRules() {
         for file in LevelLibrary.files {
-            let problems = LevelRules.validate(file.rows)
+            let problems = LevelRules.validate(file.rows,
+                                               solidCells: file.friseFootprint())
             XCTAssertTrue(problems.isEmpty,
                           "'\(file.name)' (order \(file.order)) violates the rules: "
                           + problems.joined(separator: "; "))

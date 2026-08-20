@@ -122,11 +122,11 @@ struct TriggerRuntime {
 /// it deserves to be a first-class thing rather than a special case in the scene.
 final class HazardWall: SKNode {
 
-    private let speed: CGFloat
+    private let wallSpeed: CGFloat
     private let sceneHeight: CGFloat
 
     init(startX: CGFloat, speed: CGFloat, sceneHeight: CGFloat) {
-        self.speed = speed
+        self.wallSpeed = speed
         self.sceneHeight = sceneHeight
         super.init()
         position = CGPoint(x: startX, y: 0)
@@ -170,6 +170,6 @@ final class HazardWall: SKNode {
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) not supported") }
 
     func update(dt: CGFloat) {
-        position.x += speed * dt
+        position.x += wallSpeed * dt
     }
 }

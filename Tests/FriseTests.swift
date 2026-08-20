@@ -143,7 +143,7 @@ final class FriseTests: XCTestCase {
         XCTAssertFalse(cells.isEmpty)
         // A cell well below the curve is inside the band; one well above is not.
         XCTAssertTrue(cells.contains([2, 6]) || cells.contains([2, 7]),
-                      "expected cells under the curve near column 2: \(cells.sorted())")
+                      "expected cells under the curve near column 2: \(cells.map { "\($0)" }.sorted())")
         XCTAssertFalse(cells.contains([2, 0]), "the sky is not solid")
     }
 

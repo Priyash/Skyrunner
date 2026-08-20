@@ -68,11 +68,24 @@ struct AnimGraph {
         /// `range.from → clips.first`, `range.to → clips.last`; descending is fine.
         case blend1D([String], parameter: String, range: Span)
 
+        /// A 2D blend space: clips located at authored (x, y) positions in a
+        /// 2D parameter plane, blended by inverse-distance weighting from the
+        /// three nearest clips to the current parameter point.
+        ///
+        /// Useful for 8-directional movement (speed × direction), combat stances
+        /// (aggression × health), or any pose that varies across two independent
+        /// axes simultaneously. The clip list can be irregular — no grid required.
+        ///
+        /// Minimum 3 clips. Points that share a location produce undefined blending.
+        case blend2D([(clip: String, x: CGFloat, y: CGFloat)],
+                     paramX: String, paramY: String)
+
         var clipNames: [String] {
             switch self {
             case .single(let name): return [name]
             case .speed(let name, _, _, _): return [name]
             case .blend1D(let names, _, _): return names
+            case .blend2D(let entries, _, _): return entries.map(\.clip)
             }
         }
     }
@@ -217,6 +230,11 @@ struct AnimGraph {
                     out.append("state '\(state.name)' has a zero-width blend range")
                 }
             }
+            if case .blend2D(let entries, _, _) = state.clip {
+                if entries.count < 3 {
+                    out.append("state '\(state.name)' blend2D needs ≥ 3 clips")
+                }
+            }
             if case .speed(_, _, let range, let rate) = state.clip {
                 if rate.from <= 0 || rate.to <= 0 {
                     out.append("state '\(state.name)' has a non-positive rate")
@@ -319,6 +337,30 @@ struct AnimGraphRunner {
             if low == high { return [.init(clip: names[low], weight: 1, rate: 1)] }
             return [.init(clip: names[low], weight: 1 - f, rate: 1),
                     .init(clip: names[high], weight: f, rate: 1)]
+
+        case .blend2D(let entries, let paramX, let paramY):
+            guard entries.count >= 3 else {
+                return entries.first.map { [.init(clip: $0.clip, weight: 1, rate: 1)] } ?? []
+            }
+            let px = parameters.number(paramX)
+            let py = parameters.number(paramY)
+            // Inverse-distance weighting from the three nearest clips in 2D space.
+            // IDW is smooth, needs no triangulation, and handles irregular layouts.
+            let sorted = entries.sorted {
+                let da = ($0.x-px)*($0.x-px) + ($0.y-py)*($0.y-py)
+                let db = ($1.x-px)*($1.x-px) + ($1.y-py)*($1.y-py)
+                return da < db
+            }
+            let nearest = Array(sorted.prefix(3))
+            var weights: [CGFloat] = nearest.map { e in
+                let d2 = (e.x-px)*(e.x-px) + (e.y-py)*(e.y-py)
+                return d2 < 0.0001 ? 1e6 : 1.0 / d2
+            }
+            let total = weights.reduce(0, +)
+            weights = weights.map { $0 / total }
+            return zip(nearest, weights).map { e, w in
+                .init(clip: e.clip, weight: w, rate: 1)
+            }
         }
     }
 

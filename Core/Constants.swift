@@ -1,3 +1,4 @@
+import Foundation
 import CoreGraphics
 
 enum PhysicsCategory {
@@ -66,27 +67,6 @@ enum Tuning {
     static let crusherRetractSpeed: CGFloat = 150
     static let crusherIdle: TimeInterval = 1.1
     static let crusherHold: TimeInterval = 0.45
-
-    // Enemy AI
-    static let enemyPatrolSpeed: CGFloat = 70
-    static let enemyChaseSpeed: CGFloat = 118
-    static let enemyAlertRange: CGFloat = 250     // vision distance (facing only)
-    static let enemyGiveUpRange: CGFloat = 330
-    static let enemyAlertDelay: TimeInterval = 0.35
-
-    // Coins
-    static let magnetRadius: CGFloat = 74
-    static let magnetPull: CGFloat = 420
-    static let comboWindow: TimeInterval = 1.2
-    static let comboMaxMultiplier = 5
-
-    // Camera
-    static let cameraLead: CGFloat = 0.16         // seconds of velocity to look ahead
-    static let cameraSmoothing: CGFloat = 9       // lerp rate (per second)
-
-    // Moving platforms
-    static let moverTravel: CGFloat = 55          // ± horizontal travel
-    static let moverSpeed: CGFloat = 1.1          // radians/sec of the sine drive
 
     // Enemy AI
     static let enemyPatrolSpeed: CGFloat = 70

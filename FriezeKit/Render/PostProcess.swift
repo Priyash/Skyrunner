@@ -37,6 +37,8 @@ final class PostProcess: SKEffectNode {
         /// Chromatic aberration at the frame edge, in points. Small values only:
         /// this is a lens hint, not an effect.
         var aberration: CGFloat = 0.6
+        /// Film grain strength: 0 = none, 0.04–0.08 is subtle celluloid texture.
+        var grain: CGFloat = 0
 
         static let neutral = Grade(bloomStrength: 0, vignette: 0, aberration: 0)
 
@@ -45,28 +47,32 @@ final class PostProcess: SKEffectNode {
                                  tint: SKColor(red: 1.02, green: 1.0, blue: 0.94, alpha: 1),
                                  contrast: 1.05, saturation: 1.08,
                                  bloomThreshold: 0.64, bloomStrength: 0.62,
-                                 bloomRadius: 2.8, vignette: 0.26, aberration: 0.6)
+                                 bloomRadius: 2.8, vignette: 0.26, aberration: 0.6,
+                                 grain: 0.032)
 
         /// Cooler, deeper, more contrast — thorns and shade.
         static let hollow = Grade(exposure: 0.98,
                                   tint: SKColor(red: 0.94, green: 0.99, blue: 1.04, alpha: 1),
                                   contrast: 1.12, saturation: 0.96,
                                   bloomThreshold: 0.72, bloomStrength: 0.45,
-                                  bloomRadius: 2.2, vignette: 0.36, aberration: 0.8)
+                                  bloomRadius: 2.2, vignette: 0.36, aberration: 0.8,
+                                  grain: 0.045)
 
         /// Evening: warm highlights, crushed shadows, heavy vignette.
         static let evening = Grade(exposure: 0.94,
                                    tint: SKColor(red: 1.06, green: 0.96, blue: 0.88, alpha: 1),
                                    contrast: 1.16, saturation: 1.02,
                                    bloomThreshold: 0.58, bloomStrength: 0.72,
-                                   bloomRadius: 3.2, vignette: 0.42, aberration: 0.9)
+                                   bloomRadius: 3.2, vignette: 0.42, aberration: 0.9,
+                                   grain: 0.055)
 
         /// Boss arena: desaturated, hard, cold.
         static let arena = Grade(exposure: 0.96,
                                  tint: SKColor(red: 1.0, green: 0.96, blue: 0.98, alpha: 1),
                                  contrast: 1.22, saturation: 0.82,
                                  bloomThreshold: 0.74, bloomStrength: 0.5,
-                                 bloomRadius: 2.0, vignette: 0.44, aberration: 1.2)
+                                 bloomRadius: 2.0, vignette: 0.44, aberration: 1.2,
+                                 grain: 0.06)
 
         static let named: [String: Grade] = [
             "neutral": .neutral, "grove": .grove, "hollow": .hollow,
@@ -84,15 +90,18 @@ final class PostProcess: SKEffectNode {
 
     /// Uniforms are held rather than recreated: `SKUniform` allocation per frame
     /// shows up in a profile immediately.
-    private let uExposure = SKUniform(name: "u_exposure", float: 1)
-    private let uTint = SKUniform(name: "u_tint", vectorFloat3: vector_float3(1, 1, 1))
-    private let uContrast = SKUniform(name: "u_contrast", float: 1)
-    private let uSaturation = SKUniform(name: "u_saturation", float: 1)
-    private let uBloom = SKUniform(name: "u_bloom", vectorFloat3: vector_float3(0.68, 0.55, 2.4))
-    private let uVignette = SKUniform(name: "u_vignette", float: 0.28)
-    private let uAberration = SKUniform(name: "u_aberration", float: 0.6)
-    private let uPunch = SKUniform(name: "u_punch", float: 0)
-    private let uTexel = SKUniform(name: "u_texel", vectorFloat2: vector_float2(0, 0))
+    private let uExposure    = SKUniform(name: "u_exposure",    float: 1)
+    private let uTint        = SKUniform(name: "u_tint",        vectorFloat3: vector_float3(1, 1, 1))
+    private let uContrast    = SKUniform(name: "u_contrast",    float: 1)
+    private let uSaturation  = SKUniform(name: "u_saturation",  float: 1)
+    private let uBloom       = SKUniform(name: "u_bloom",       vectorFloat3: vector_float3(0.68, 0.55, 2.4))
+    private let uVignette    = SKUniform(name: "u_vignette",    float: 0.28)
+    private let uAberration  = SKUniform(name: "u_aberration",  float: 0.6)
+    private let uPunch       = SKUniform(name: "u_punch",       float: 0)
+    private let uTexel       = SKUniform(name: "u_texel",       vectorFloat2: vector_float2(0, 0))
+    private let uGrain       = SKUniform(name: "u_grain",       float: 0)
+    private let uTime        = SKUniform(name: "u_time",        float: 0)
+    private var elapsed: CGFloat = 0
 
     /// - Parameter size: the scene size in points, for the texel step.
     init(size: CGSize) {
@@ -104,7 +113,7 @@ final class PostProcess: SKEffectNode {
         shouldRasterize = false
         shader = PostProcess.makeShader()
         shader?.uniforms = [uExposure, uTint, uContrast, uSaturation, uBloom,
-                            uVignette, uAberration, uPunch, uTexel]
+                            uVignette, uAberration, uPunch, uTexel, uGrain, uTime]
         uTexel.vectorFloat2Value = vector_float2(Float(1 / max(size.width, 1)),
                                                 Float(1 / max(size.height, 1)))
         apply(.grove)
@@ -123,12 +132,14 @@ final class PostProcess: SKEffectNode {
         uBloom.vectorFloat3Value = vector_float3(Float(grade.bloomThreshold),
                                                  Float(grade.bloomStrength),
                                                  Float(grade.bloomRadius))
-        uVignette.floatValue = Float(grade.vignette)
+        uVignette.floatValue   = Float(grade.vignette)
         uAberration.floatValue = Float(grade.aberration)
+        uGrain.floatValue      = Float(grade.grain)
         // A grade with nothing switched on should cost nothing at all.
         shouldEnableEffects = !(grade.bloomStrength == 0 && grade.vignette == 0
                                 && grade.aberration == 0 && grade.exposure == 1
-                                && grade.contrast == 1 && grade.saturation == 1)
+                                && grade.contrast == 1 && grade.saturation == 1
+                                && grade.grain == 0)
     }
 
     func apply(named name: String) -> Bool {
@@ -144,12 +155,15 @@ final class PostProcess: SKEffectNode {
     }
 
     func update(_ dt: CGFloat) {
-        guard punch > 0.001 else {
-            if uPunch.floatValue != 0 { uPunch.floatValue = 0 }
-            return
+        elapsed += dt
+        // Animate the grain seed so it looks like film, not a static texture overlay.
+        uTime.floatValue = Float(elapsed)
+        if punch > 0.001 {
+            punch = max(0, punch - punchDecay * dt)
+            uPunch.floatValue = Float(punch)
+        } else if uPunch.floatValue != 0 {
+            uPunch.floatValue = 0
         }
-        punch = max(0, punch - punchDecay * dt)
-        uPunch.floatValue = Float(punch)
     }
 
     // MARK: The pass
@@ -157,8 +171,8 @@ final class PostProcess: SKEffectNode {
     private static func makeShader() -> SKShader {
         // One fragment pass over the composited frame. Ordering matters and is
         // the conventional one: sample (with aberration) → bloom → exposure/tint →
-        // contrast → saturation → vignette. Grading before bloom would make the
-        // bloom chase the grade rather than the light.
+        // contrast → saturation → vignette → grain. Grading before bloom would make
+        // the bloom chase the grade rather than the scene's own light.
         SKShader(source: """
         void main() {
             vec2 uv = v_tex_coord;
@@ -178,17 +192,25 @@ final class PostProcess: SKEffectNode {
             base.r = texture2D(u_texture, uv + offset).r;
             base.b = texture2D(u_texture, uv - offset).b;
 
-            // Bright-pass bloom. Four diagonal taps at the bloom radius: with a
-            // single pass available there is no separable blur to run, and at 2D
-            // scale four taps of the *thresholded* image is visually the same as
-            // a wide Gaussian of it.
+            // Bright-pass bloom. Eight taps: four diagonal + four axis-aligned.
+            // The axis-aligned taps add directional cross streaks on specular
+            // highlights (backlit leaves, coin glints) — the UbiArt signature look.
+            // At 2D scale this still reads as a single soft halo at normal bloom
+            // radii, but adds directionality that pure diagonal taps lack.
             vec2 step = u_texel * u_bloom.z;
+            vec2 step2 = step * 1.8;  // wider axis taps for the cross arm
             vec3 sum = vec3(0.0);
+            // Diagonal ring
             sum += max(texture2D(u_texture, uv + vec2( step.x,  step.y)).rgb - u_bloom.x, 0.0);
             sum += max(texture2D(u_texture, uv + vec2(-step.x,  step.y)).rgb - u_bloom.x, 0.0);
             sum += max(texture2D(u_texture, uv + vec2( step.x, -step.y)).rgb - u_bloom.x, 0.0);
             sum += max(texture2D(u_texture, uv + vec2(-step.x, -step.y)).rgb - u_bloom.x, 0.0);
-            vec3 colour = base.rgb + sum * (u_bloom.y * 0.25);
+            // Axis cross (0.5 weight — the cross is a hint, not the dominant shape)
+            sum += max(texture2D(u_texture, uv + vec2( step2.x, 0.0    )).rgb - u_bloom.x, 0.0) * 0.5;
+            sum += max(texture2D(u_texture, uv + vec2(-step2.x, 0.0    )).rgb - u_bloom.x, 0.0) * 0.5;
+            sum += max(texture2D(u_texture, uv + vec2( 0.0,     step2.y)).rgb - u_bloom.x, 0.0) * 0.5;
+            sum += max(texture2D(u_texture, uv + vec2( 0.0,    -step2.y)).rgb - u_bloom.x, 0.0) * 0.5;
+            vec3 colour = base.rgb + sum * (u_bloom.y / 6.0);
 
             colour *= u_exposure * u_tint;
             colour = (colour - 0.5) * u_contrast + 0.5;
@@ -200,6 +222,17 @@ final class PostProcess: SKEffectNode {
 
             float vig = 1.0 - u_vignette * smoothstep(0.25, 0.95, sqrt(r2) * 1.42);
             colour *= vig;
+
+            // Film grain: high-frequency hash noise seeded by pixel position and
+            // time so it changes every frame. Applied after grading so the grade
+            // does not affect the grain density. Luminance-weighted: bright areas
+            // show finer grain (film physics — denser silver halide in highlights).
+            if (u_grain > 0.001) {
+                vec2 seed = uv * 843.7 + u_time * 0.017;
+                float noise = fract(sin(dot(seed, vec2(127.1, 311.7))) * 43758.5453);
+                float grainScale = 1.0 - luma * 0.4;   // finer in highlights
+                colour += (noise - 0.5) * u_grain * grainScale;
+            }
 
             // Premultiplied: SpriteKit composites premultiplied alpha, and
             // forgetting this makes every transparent edge glow.

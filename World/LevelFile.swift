@@ -200,6 +200,20 @@ enum LevelLibrary {
         return entries.indices.compactMap { rows(at: $0) }
     }
 
+    // MARK: - Per-level optional fields
+
+    static func frieze(at index: Int) -> String? { file(at: index)?.frieze }
+    static func timeOfDay(at index: Int) -> CGFloat? { file(at: index)?.timeOfDay }
+    static func music(at index: Int) -> String? { file(at: index)?.music }
+    static func grade(at index: Int) -> String? { file(at: index)?.grade }
+    static func triggers(at index: Int) -> [TriggerSpec] { file(at: index)?.triggers ?? [] }
+    static func camera(at index: Int) -> CameraSpec { file(at: index)?.camera ?? CameraSpec() }
+    static func frises(at index: Int) -> [FriseSpec] { file(at: index)?.frises ?? [] }
+    static func enemyBehaviour(at index: Int) -> BehaviourGraph? {
+        guard let name = file(at: index)?.enemyBehaviour else { return nil }
+        return BehaviourGraph.load(named: name)
+    }
+
     static var count: Int { entries.isEmpty ? Levels.builtIn.count : entries.count }
 
     /// Names in play order, for the menu and for tooling. Straight from the index, so
@@ -217,10 +231,15 @@ enum LevelLibrary {
     /// the index exists to avoid, and at a thousand levels it is a second of launch.
     static var files: [LevelFile] { entries.indices.compactMap { file(at: $0) } }
 
+    /// Problems accumulated by `legacyScan()` — lives here so the computed
+    /// `loadProblems` can include them without the function assigning to itself.
+    private static var _legacyScanProblems: [String] = []
+
     /// Problems found while loading, so `make verify` and the tests can report them
     /// instead of a level silently vanishing from the menu.
     static var loadProblems: [String] {
         var out = index?.problems ?? []
+        out += _legacyScanProblems
         // An index that names a level whose file is missing or broken is the failure
         // mode the index introduces, so it is the one worth reporting loudly.
         for entry in entries where LevelStore.shared.level(named: entry.name) == nil {
@@ -263,7 +282,7 @@ enum LevelLibrary {
             problems.append("order \(file.order) is used by more than one level "
                             + "(including '\(file.name)')")
         }
-        loadProblems = problems
+        _legacyScanProblems = problems
         return found.sorted { ($0.order, $0.name) < ($1.order, $1.name) }
     }
 }

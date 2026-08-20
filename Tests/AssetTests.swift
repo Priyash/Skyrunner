@@ -320,7 +320,7 @@ final class AssetTests: XCTestCase {
         let scene = try XCTUnwrap(FriezeScene.load(named: "forest_backdrop"))
         guard let layer = scene.layers.first(where: { ($0.density ?? 3) > 3.05 }),
               let art = UIImage(named: layer.image) else {
-            return XCTSkip("no layer in this scene is denser than nominal")
+            throw XCTSkip("no layer in this scene is denser than nominal")
         }
         let corrected = FriezeBaker.pointSize(imageNamed: layer.image, scale: 1,
                                               density: layer.density ?? 3)
@@ -336,7 +336,7 @@ final class AssetTests: XCTestCase {
         // `density` existed, or installing it silently resized every backdrop.
         guard let image = FriezeScene.load(named: "forest_backdrop")?
             .layers.first?.image, let art = UIImage(named: image) else {
-            return XCTSkip("no backdrop art to measure")
+            throw XCTSkip("no backdrop art to measure")
         }
         let plain = FriezeBaker.pointSize(imageNamed: image, scale: 1, density: 3)
         XCTAssertEqual(plain.width, art.size.width, accuracy: 0.001)

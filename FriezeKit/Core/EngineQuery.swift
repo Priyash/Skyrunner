@@ -191,6 +191,14 @@ enum EngineSnapshot {
         let rows = overrides.rows(forLevel: index) ?? []
         let light = overrides.effectiveLighting
 
+        let levelFile = LevelLibrary.file(at: index)
+        let levelName: String = levelFile?.name ?? "builtIn\(index)"
+        let levelTitle: String = levelFile?.displayTitle ?? "Level \(index + 1)"
+        let levelFrieze: String = overrides.friezeOverride ?? LevelLibrary.frieze(at: index) ?? "forest_backdrop"
+        let levelMusic: Any = Audio.shared.currentMusic ?? LevelLibrary.music(at: index) ?? NSNull()
+        let levelGrade: String = overrides.grade ?? LevelLibrary.grade(at: index) ?? "grove"
+        let levelSource: String = LevelLibrary.files.isEmpty ? "compiled" : "file"
+
         var out: [String: Any] = [
             "version": EngineScript.version,
             "level": [
@@ -202,17 +210,12 @@ enum EngineSnapshot {
                 "size": ["cols": rows.map(\.count).max() ?? 0, "rows": rows.count],
                 "tileSize": Double(Tuning.tileSize),
                 "histogram": histogram(rows),
-                // What the level actually is, not just what was overridden — a
-                // caller cannot otherwise tell a level's own backdrop from the
-                // default, or find out that the level has a name.
-                "name": LevelLibrary.file(at: index)?.name ?? "builtIn\(index)",
-                "title": LevelLibrary.file(at: index)?.displayTitle ?? "Level \(index + 1)",
-                "frieze": overrides.friezeOverride
-                    ?? LevelLibrary.frieze(at: index) ?? "forest_backdrop",
-                "music": Audio.shared.currentMusic ?? LevelLibrary.music(at: index)
-                    ?? NSNull(),
-                "source": LevelLibrary.files.isEmpty ? "compiled" : "file",
-                "grade": overrides.grade ?? LevelLibrary.grade(at: index) ?? "grove",
+                "name": levelName,
+                "title": levelTitle,
+                "frieze": levelFrieze,
+                "music": levelMusic,
+                "source": levelSource,
+                "grade": levelGrade,
                 "postProcess": overrides.postProcess,
             ],
             "tuning": [

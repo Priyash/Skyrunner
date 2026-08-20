@@ -64,6 +64,20 @@ struct FriezeScene: Decodable {
         /// backdrop would be laid out twice too big.
         var density: CGFloat? = nil
     }
+    /// Scattered prop instances on a backdrop plane — trunks, rocks, bushes.
+    struct Prop: Decodable {
+        let image: String              // bundle image name (no @2x/@3x suffix)
+        let count: Int                 // number of instances to place
+        let span: CGFloat              // horizontal spread in scene points
+        let y: CGFloat                 // vertical center in camera space
+        var yJitter: CGFloat = 8       // ± vertical jitter in points
+        var scale: CGFloat = 1         // uniform size multiplier
+        var scaleJitter: CGFloat = 0.15  // ± fractional scale variation
+        var flipChance: CGFloat = 0.5  // 0…1 probability of a horizontal flip
+        var seed: Int = 42             // LCG seed for deterministic placement
+        var density: CGFloat? = nil    // pixels per scene point (@3x = 3)
+    }
+
     struct Rays: Decodable {
         let x: CGFloat
         let y: CGFloat

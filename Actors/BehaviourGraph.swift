@@ -75,7 +75,7 @@ struct BehaviourGraph: Codable, Equatable {
     }
 
     /// A transition guard. Every case is something the scene can actually measure.
-    enum Condition: Equatable {
+    indirect enum Condition: Equatable {
         case always
         /// Player within N points.
         case playerWithin(CGFloat)

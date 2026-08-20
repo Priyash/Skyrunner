@@ -208,10 +208,10 @@ enum Geometry2D {
                 let overlap = min(maxA - minB, maxB - minA)
                 if overlap < bestDepth {
                     bestDepth = overlap
-                    // Point the axis from a toward b, so callers can push away.
+                    // Point the axis from b toward a so callers can push a out of b.
                     let centreA = centroid(a), centreB = centroid(b)
                     let sign: CGFloat =
-                        (centreB.x - centreA.x) * ax + (centreB.y - centreA.y) * ay < 0 ? -1 : 1
+                        (centreB.x - centreA.x) * ax + (centreB.y - centreA.y) * ay > 0 ? -1 : 1
                     bestAxis = CGVector(dx: ax * sign, dy: ay * sign)
                 }
             }

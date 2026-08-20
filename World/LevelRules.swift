@@ -133,10 +133,13 @@ enum TileSymbol {
     /// slopes, conveyors and springs are all things you can stand on.
     static let solid: Set<Character> = ["X", "D", "M", "P", "/", "\\", ">", "<", "!"]
 
-    /// Tiles a body can occupy. Ground and crates fill their cell; platforms are
-    /// thin, so you stand on the cell above them and can also pass through.
+    /// Tiles a body can occupy — i.e. the player can stand IN this cell.
+    /// Solid tiles (X, D) and semi-solid standable surfaces (slopes, platforms,
+    /// conveyors, springs) all block occupancy: the player stands on top of them,
+    /// not inside them. Only air, hazards, and interactive non-solid tiles are
+    /// passable so the reachability search never walks through a floor.
     static func isPassable(_ symbol: Character) -> Bool {
-        symbol != "X" && symbol != "D"
+        !solid.contains(symbol)
     }
 
     /// Tiles that carry the player upward for free, so reachability may climb
@@ -246,10 +249,10 @@ enum LevelRules {
         // An unknown glyph builds as empty air, so a typo silently deletes a
         // platform. `setLevel` refuses one at the API boundary, but a hand-written
         // level file or the compiled table never passed through that check.
-        for symbol in positions.keys.sorted() where !accepted.contains(symbol) {
+        for symbol in positions.keys.sorted() where !TileSymbol.accepted.contains(symbol) {
             let where_ = positions[symbol]!.first!
             out.append("unknown tile '\(symbol)' at column \(where_.col), row "
-                       + "\(where_.row) — legal symbols are \(allowedText)")
+                       + "\(where_.row) — legal symbols are \(TileSymbol.allowedText)")
         }
 
         let spawns = positions["S"]?.count ?? 0
@@ -331,7 +334,8 @@ enum LevelRules {
         }
 
         out.append(contentsOf: reachability(grid: grid, width: width, height: height,
-                                            positions: positions))
+                                            positions: positions,
+                                            solidCells: solidCells))
         return out
     }
 
@@ -344,14 +348,17 @@ enum LevelRules {
     /// possible level impossible. A validator that cried wolf on hand-made
     /// levels would just be switched off.
     private static func reachability(grid: [[Character]], width: Int, height: Int,
-                                     positions: [Character: [(col: Int, row: Int)]]) -> [String] {
+                                     positions: [Character: [(col: Int, row: Int)]],
+                                     solidCells: Set<[Int]> = []) -> [String] {
         guard let start = positions["S"]?.first else { return [] }
         let exit = positions["F"]?.first ?? positions["K"]?.first
         guard let exit else { return [] }
 
         func at(_ col: Int, _ row: Int) -> Character {
             guard grid.indices.contains(row), grid[row].indices.contains(col) else { return "." }
-            return grid[row][col]
+            let glyph = grid[row][col]
+            if glyph == ".", solidCells.contains([col, row]) { return "X" }
+            return glyph
         }
 
         /// A cell you can stand in: passable, with something solid underfoot.

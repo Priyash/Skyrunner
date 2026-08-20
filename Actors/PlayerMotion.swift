@@ -154,9 +154,11 @@ struct PlayerMotion {
             let sign: CGFloat = along.dx * input.move >= 0 ? 1 : -1
             let speed = abs(input.move) * runSpeed * Tuning.slopeAssist
             vx = along.dx * sign * speed
+            let slopeVY = along.dy * sign * speed
+            // Uphill: carry the player up along the surface.
             // Downhill: bias into the surface so the player doesn't launch off
             // every crest and bunny-hop down the ramp.
-            vy = min(vy, along.dy * sign * speed)
+            vy = slopeVY > 0 ? slopeVY : min(vy, slopeVY)
         }
 
         if world.inUpdraft {

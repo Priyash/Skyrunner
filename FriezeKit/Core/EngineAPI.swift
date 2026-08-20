@@ -122,14 +122,18 @@ enum EngineScript {
     static func parse(data: Data) -> (commands: [EngineCommand], errors: [String]) {
         var commands: [EngineCommand] = []
         var errors: [String] = []
-        guard let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let list = root["commands"] as? [[String: Any]] else {
+        let root = try? JSONSerialization.jsonObject(with: data)
+        // Accept both {version, commands:[…]} and the bare array [op, op, …] form.
+        let list: [[String: Any]]
+        if let dict = root as? [String: Any], let cmds = dict["commands"] as? [[String: Any]] {
+            if let v = num(dict["version"]), Int(v) != version {
+                return ([], ["document version \(Int(v)) — this build speaks version \(version)"])
+            }
+            list = cmds
+        } else if let bare = root as? [[String: Any]] {
+            list = bare
+        } else {
             return ([], ["document is not {version, commands:[…]}"])
-        }
-        // An unknown version is refused rather than best-guessed: a document
-        // written for a later vocabulary would apply half of itself.
-        if let v = num(root["version"]), Int(v) != version {
-            return ([], ["document version \(Int(v)) — this build speaks version \(version)"])
         }
         guard list.count <= 2048 else {
             return ([], ["document exceeds 2048 commands"])
@@ -165,11 +169,18 @@ enum EngineScript {
         return CGFloat(d)
     }
 
-    /// A map coordinate: finite, non-negative, and inside the documented map
-    /// limits. Out-of-range is refused at parse time so the interpreter only
-    /// ever bounds-checks against the *actual* level.
+    /// A map coordinate within the documented structural limits: finite,
+    /// non-negative, and ≤ limit. Used for ops where out-of-limit is itself invalid
+    /// (e.g. spawn-actor region widths). The apply-layer does the per-level check.
     private static func gridIndex(_ any: Any?, limit: Int) -> Int? {
         guard let v = num(any), v >= 0, v <= CGFloat(limit) else { return nil }
+        return Int(v)
+    }
+
+    /// Any finite non-negative integer — used for tile col/row where the limit
+    /// is the actual level's size, enforced at apply time, not parse time.
+    private static func naturalInt(_ any: Any?) -> Int? {
+        guard let v = num(any), v >= 0, v < 1_000_000 else { return nil }
         return Int(v)
     }
 
@@ -199,9 +210,21 @@ enum EngineScript {
         return c == " " ? "." : c
     }
 
+    /// Lightweight string-based error for JSON parse failures inside `make()`.
+    private struct ParseError: Error, ExpressibleByStringInterpolation, CustomStringConvertible {
+        let message: String
+        typealias StringInterpolation = String.StringInterpolation
+        init(stringLiteral v: StringLiteralType) { message = v }
+        init(stringInterpolation s: String.StringInterpolation) {
+            message = String(stringInterpolation: s)
+        }
+        init(_ m: String) { message = m }
+        var description: String { message }
+    }
+
     /// Every op validates its own arguments; unknown ops are rejected, not
     /// ignored, so a typo surfaces instead of silently doing nothing.
-    private static func make(op: String, raw: [String: Any]) -> Result<EngineCommand, String> {
+    private static func make(op: String, raw: [String: Any]) -> Result<EngineCommand, ParseError> {
         switch op {
         case "setLevel":
             guard let rows = raw["rows"] as? [String], !rows.isEmpty else {
@@ -209,8 +232,7 @@ enum EngineScript {
             }
             guard rows.count <= LevelRules.maxRows,
                   rows.allSatisfy({ $0.count <= LevelRules.maxColumns }) else {
-                return .failure("level exceeds \(LevelRules.maxRows) rows / "
-                                + "\(LevelRules.maxColumns) columns")
+                return .failure("level exceeds \(LevelRules.maxRows) rows / \(LevelRules.maxColumns) columns")
             }
             guard rows.contains(where: { !$0.isEmpty }) else {
                 return .failure("level has no columns")
@@ -221,19 +243,18 @@ enum EngineScript {
             return .success(.setLevel(rows: rows))
 
         case "setTile":
-            guard let c = gridIndex(raw["col"], limit: LevelRules.maxColumns),
-                  let r = gridIndex(raw["row"], limit: LevelRules.maxRows),
+            guard let c = naturalInt(raw["col"]),
+                  let r = naturalInt(raw["row"]),
                   let s = symbol(raw["symbol"]) else {
-                return .failure("needs col, row (row 0 = TOP) and a symbol from "
-                                + TileSymbol.allowedText)
+                return .failure("needs col, row (row 0 = TOP) and a symbol from \(TileSymbol.allowedText)")
             }
             return .success(.setTile(col: c, row: r, symbol: s))
 
         case "fillRegion":
-            guard let c = gridIndex(raw["col"], limit: LevelRules.maxColumns),
-                  let r = gridIndex(raw["row"], limit: LevelRules.maxRows),
-                  let w = gridIndex(raw["width"], limit: LevelRules.maxColumns),
-                  let h = gridIndex(raw["height"], limit: LevelRules.maxRows),
+            guard let c = naturalInt(raw["col"]),
+                  let r = naturalInt(raw["row"]),
+                  let w = naturalInt(raw["width"]),
+                  let h = naturalInt(raw["height"]),
                   let s = symbol(raw["symbol"]) else {
                 return .failure("needs col, row, width, height, symbol")
             }
@@ -334,9 +355,7 @@ enum EngineScript {
                 return .failure("needs name")
             }
             guard PostProcess.Grade.named[name] != nil else {
-                return .failure("unknown grade '\(name)' (have "
-                                + PostProcess.Grade.named.keys.sorted()
-                                    .joined(separator: ", ") + ")")
+                return .failure("unknown grade '\(name)' (have \(PostProcess.Grade.named.keys.sorted().joined(separator: ", ")))")
             }
             return .success(.setGrade(name: name))
         case "reset":
@@ -795,7 +814,7 @@ final class EngineInterpreter {
         scene?.children.compactMap { $0 as? PostProcess }.first
     }
 
-    private func forEachSkeleton(_ body: (SkeletonNode) -> Void) {
+    private func forEachSkeleton(_ body: @escaping (SkeletonNode) -> Void) {
         scene?.enumerateChildNodes(withName: "//*") { node, _ in
             if let rig = node as? SkeletonNode { body(rig) }
         }
